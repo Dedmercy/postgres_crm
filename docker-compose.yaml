@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+
+  db:
+    container_name: database
+    build: 
+      context : .
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "VupsenPupsen228"
+#    volumes:
+#      - type: bind
+#        source: ./export
+#        target: /var/lib/postgresql/export
+    ports:
+      - "5431:5432"
