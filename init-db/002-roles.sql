@@ -1,8 +1,8 @@
 
 -- Серверная роль
 CREATE ROLE backend WITH
-	LOGIN,
-	PASSWORD "Rkahwhx5rbY8",
+	LOGIN
+	PASSWORD 'Rkahwhx5rbY8'
 	CREATEROLE;
 
 -- Роль клиент
