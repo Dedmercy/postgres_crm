@@ -25,7 +25,7 @@ CREATE TABLE Account
 	-- Логин учетной записи.
 	login varchar(12) NOT NULL UNIQUE,
 	-- Захешированный пароль
-	hash_password varchar(256) NOT NULL,
+	hash_password text NOT NULL,
 	-- Идентификатор роли
 	role_id int NOT NULL,
 	-- Идентификационный номер пользователя

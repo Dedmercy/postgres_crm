@@ -25,14 +25,14 @@ CREATE PROCEDURE create_user(
 	EXECUTE FORMAT('GRANT %I TO %I', role_name, user_nickname);
 	--	Заполняем таблицу с Персональными данными
 	INSERT INTO user_personal_data(
-		user_id,
+		user_data_id,
 		user_first_name,
 		user_middle_name,
 		user_last_name,
 		user_email,
 		user_phone)
 	VALUES(
-		id,
+		data_id,
 		first_name,
 		middle_name,
 		last_name,
@@ -40,6 +40,7 @@ CREATE PROCEDURE create_user(
 		phone);
 	--	Заполняем таблицу с данными учетной записи
 	INSERT INTO account(
+		account_id,
 		login,
 		hash_password,
 		role_id,
@@ -48,9 +49,11 @@ CREATE PROCEDURE create_user(
 		last_seen_datetime,
 		is_executor)
 	VALUES(
+		to_regrole(user_nickname),
 		user_nickname,
-		crypto(user_password, gen_salt('md5')),
+		crypt(user_password, gen_salt('md5')),
 		to_regrole(role_name),
+		data_id,
 		CURRENT_DATE,
 		CURRENT_TIMESTAMP,
 		executor_status);
