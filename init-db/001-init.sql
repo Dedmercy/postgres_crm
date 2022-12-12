@@ -34,7 +34,9 @@ CREATE TABLE Account
 	-- 
 	account_registration_date timestamp NOT NULL,
 	-- Дата и время последнего входа в систему.
-	last_seen_datetime timestamp NOT NULL,
+	last_seen_datetime timestamp,
+	-- Является ли аккаунт исполнителем или клиентом.
+	is_executor boolean NOT NULL,
 	PRIMARY KEY (account_id)
 ) WITHOUT OIDS;
 
@@ -267,6 +269,7 @@ COMMENT ON COLUMN Account.user_id  IS 'Идентификационный ном
 COMMENT ON COLUMN Account.account_registration_date IS 'Дата регистрации
 ';
 COMMENT ON COLUMN Account.last_seen_datetime IS 'Дата и время последнего входа в систему.';
+COMMENT ON COLUMN Account.is_executor IS 'Является ли аккаунт исполнителем или клиентом.';
 COMMENT ON COLUMN Editing.task_id IS 'Идентификатор задания';
 COMMENT ON COLUMN Editing.editing_num IS 'Идентификатор правки';
 COMMENT ON COLUMN Editing.editing_header IS 'Заголовок правки';
