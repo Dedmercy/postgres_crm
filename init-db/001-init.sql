@@ -32,7 +32,7 @@ CREATE TABLE Account
 	user_id  int NOT NULL,
 	-- Дата регистрации
 	-- 
-	account_registration_date timestamp NOT NULL,
+	account_registration_date date NOT NULL,
 	-- Дата и время последнего входа в систему.
 	last_seen_datetime timestamp NOT NULL,
 	PRIMARY KEY (account_id)

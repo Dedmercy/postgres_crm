@@ -1,21 +1,19 @@
 
-
-
--- CREATE REVIEW
-
-CREATE PROCEDURE create_review (	account INT,
-									num INT,
-									header VARCHAR(25),
-									descr TEXT,
-									mark SMALLINT)
+-- Создание Отзыва о пользователе
+CREATE PROCEDURE create_review (	
+	account INT,
+	num INT,
+	header VARCHAR(25),
+	descr TEXT,
+	mark SMALLINT)
 LANGUAGE 'sql'
 AS $$
 	INSERT INTO review (
-		account_id int NOT NULL,
-		review_num int NOT NULL,
-		review_header varchar(25),
-		review_text text,
-		review_mark smallint NOT NULL
+		account_id,
+		review_num,
+		review_header,
+		review_text,
+		review_mark
 		)
 	VALUES (
 		account,
@@ -24,10 +22,11 @@ AS $$
 		descr,
 		mark);
 $$;
- 	
+
+-- Разрешить всем категориям пользователей оставлять отзывы
 REVOKE ALL ON PROCEDURE create_review FROM PUBLIC;
 GRANT EXECUTE ON PROCEDURE create_review TO client, freelancer;
-
+-- Разрешить доступ к таблице review
 GRANT SELECT, INSERT ON review TO client, freelancer;
 
 
@@ -46,8 +45,5 @@ AS $$
 	ORDER BY review_num;
 $$;
  	
-REVOKE ALL ON PROCEDURE watch_reviews FROM PUBLIC;
-GRANT EXECUTE ON PROCEDURE watch_reviews TO client, freelancer;
-
-GRANT SELECT ON review TO client, freelancer;
-
+REVOKE ALL ON FUNCTION watch_reviews FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION watch_reviews TO client, freelancer;
