@@ -15,7 +15,7 @@ CREATE PROCEDURE create_user(
 	user_nickname CHARACTER VARYING(12),
 	user_password CHARACTER VARYING(20),
 	role_name CHARACTER VARYING(20),
-	executor_status BOOLEAN,
+	executor_status BOOLEAN
 	)
 	AS $$
 	BEGIN
