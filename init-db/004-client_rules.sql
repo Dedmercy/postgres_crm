@@ -3,11 +3,12 @@
 
 -- CREATE TASK
 
-CREATE PROCEDURE create_task (	id INT, 
-								descr TEXT, 
-								executor INT, 
-								deadline TIMESTAMP WITHOUT TIME ZONE, 
-								perk INT)
+CREATE PROCEDURE create_task (	
+	id INT, 
+	descr TEXT, 
+	executor INT, 
+	deadline TIMESTAMP WITHOUT TIME ZONE, 
+	perk INT)
 LANGUAGE 'sql'
 AS $$
 	INSERT INTO task (
@@ -66,17 +67,18 @@ GRANT SELECT, DELETE ON task_status TO client;
 
 -- CONFIRM EXECUTOR
 
-CREATE PROCEDURE confirm_executor(	executor INT,
-									task INT)
+CREATE PROCEDURE confirm_executor(	
+	potential_executor INT,
+	selected_task INT)
 LANGUAGE 'sql'
 AS $$
 	UPDATE task
-	SET executor = executor
-	WHERE task_id = task;
+	SET executor = potential_executor
+	WHERE task_id = selected_task;
 
 	UPDATE task_status
 	SET task_status = 'WORK'
-	WHERE task_id = task;
+	WHERE task_id = selected_task;
 $$;
  	
 REVOKE ALL ON PROCEDURE confirm_executor FROM PUBLIC;
@@ -89,10 +91,11 @@ GRANT SELECT, UPDATE ON task_status TO client;
 
 -- ADD EDITING
 
-CREATE PROCEDURE add_editing(	task INT,
-								num INT,
-								header VARCHAR(50),
-								descr TEXT)
+CREATE PROCEDURE add_editing(	
+	task INT,
+	num INT,
+	header VARCHAR(50),
+	descr TEXT)
 
 LANGUAGE 'sql'
 AS $$

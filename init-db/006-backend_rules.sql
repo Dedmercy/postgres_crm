@@ -14,8 +14,7 @@ CREATE PROCEDURE create_user(
 	phone BIGINT,
 	user_nickname CHARACTER VARYING(12),
 	user_password CHARACTER VARYING(20),
-	role_name CHARACTER VARYING(20),
-	executor_status BOOLEAN
+	role_name CHARACTER VARYING(20)
 	)
 	AS $$
 	BEGIN
@@ -46,8 +45,7 @@ CREATE PROCEDURE create_user(
 		role_id,
 		user_data_id,
 		account_registration_date,
-		last_seen_datetime,
-		is_executor)
+		last_seen_datetime)
 	VALUES(
 		to_regrole(user_nickname),
 		user_nickname,
@@ -55,11 +53,11 @@ CREATE PROCEDURE create_user(
 		to_regrole(role_name),
 		data_id,
 		CURRENT_DATE,
-		CURRENT_TIMESTAMP,
-		executor_status);
+		CURRENT_TIMESTAMP);
 	END;
 	$$
 	LANGUAGE plpgsql;
 
-	
+REVOKE EXECUTE ON PROCEDURE create_user FROM PUBLIC;
+GRANT EXECUTE ON PROCEDURE create_user TO backend;
  
