@@ -1,0 +1,33 @@
+#creation-task-box{
+    border: 1px solid #D8DEE4;
+    margin: 20px;
+    padding: 20px;
+    background-color: #F6F8FA;
+}
+
+#submit{
+    height: 2em;
+    width: 30%;
+    background-color: #60c465;
+    border: 1px solid #D8DEE4;
+    margin: 10px 0 0 0;
+}
+
+input{
+    height: 2em;
+    width: 30%;
+}
+
+select{
+    height: 3em;
+    width: 30.35%;
+}
+
+textarea{
+    height: 10em;
+    width: 30%;
+}
+
+#creation-task-box h1{
+    text-align: center;
+}

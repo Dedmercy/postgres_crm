@@ -1,5 +1,8 @@
 
+
+
 -- Создание Отзыва о пользователе
+
 CREATE PROCEDURE create_review (	
 	account INT,
 	num INT,
@@ -45,3 +48,5 @@ $$;
  	
 REVOKE ALL ON FUNCTION watch_reviews FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION watch_reviews TO client, freelancer;
+
+GRANT SELECT ON review TO client, freelancer;
