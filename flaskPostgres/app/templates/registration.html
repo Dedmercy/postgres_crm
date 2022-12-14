@@ -1,0 +1,47 @@
+{% extends "main-menu-base.html"  %}
+
+{% block content %}
+    <section id="registration-section">
+        <h1>New User Registration</h1>
+        <div id="registration-form-container">
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div>
+                <p>{{ form.first_name.label }}</p>
+                <div>{{ form.first_name() }}</div>
+            </div>
+            <div>
+                <p>{{ form.middle_name.label }}</p>
+                <div>{{ form.middle_name() }}</div>
+            </div>
+            <div>
+                <p>{{ form.last_name.label }}</p>
+                <div>{{ form.last_name() }}</div>
+            </div>
+            <div>
+                <p>{{ form.email.label }}</p>
+                <div>{{ form.email() }}</div>
+            </div>
+            <div>
+                <p>{{ form.phone.label }}</p>
+                <div>{{ form.phone() }}</div>
+            </div>
+            <div>
+                 <p>{{ form.post.label }}</p>
+                <div>{{ form.post() }}</div>
+            </div>
+            <div>
+                <p>{{ form.username.label }}</p>
+                <div>{{ form.username() }}</div>
+            </div>
+            <div>
+                <p>{{ form.password.label }}</p>
+                <div>{{ form.password() }}</div>
+            </div>
+            <div>
+                <div>{{ form.submit() }}</div>
+            </div>
+        </form>
+        </div>
+    </section>
+{% endblock %}

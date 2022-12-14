@@ -1,0 +1,23 @@
+footer{
+    background-color: #343A40;
+    color: #F6F8FA;
+    text-align: center;
+    padding: 10px 0 10px 0;
+}
+
+footer p{
+    margin: 0;
+}
+
+html, body{
+    height: 100%;
+}
+
+.wrapper{
+    min-height: calc(100vh - 38px);
+}
+
+footer a{
+    text-decoration: none;
+    color: #F6F8FA;
+}

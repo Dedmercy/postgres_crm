@@ -1,5 +1,8 @@
 
+
+
 -- Создание Отзыва о пользователе
+
 CREATE PROCEDURE create_review (	
 	account INT,
 	num INT,
@@ -33,8 +36,6 @@ GRANT SELECT, INSERT ON review TO client, freelancer;
 
 -- WATCH REVIEWS
 
---CREATE TYPE review AS (name character varying(50), gen INT, in_time INT, out_time INT, not_time INT, in_process INT);
-
 CREATE FUNCTION watch_reviews (id_user INT)
 RETURNS review
 LANGUAGE 'sql'
@@ -47,3 +48,5 @@ $$;
  	
 REVOKE ALL ON FUNCTION watch_reviews FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION watch_reviews TO client, freelancer;
+
+GRANT SELECT ON review TO client, freelancer;
