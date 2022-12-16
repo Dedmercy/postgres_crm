@@ -1,5 +1,7 @@
 import logging as log
 
+import sqlalchemy.engine
+
 from app import app
 from app.models import Employee
 from app.forms import RegistrationForm, LoginForm, CreationTaskForm, TimeReportForm
@@ -9,8 +11,15 @@ from sqlalchemy import text, create_engine
 from flask import render_template, redirect, url_for, flash, request
 from sqlalchemy.exc import OperationalError
 from flask_login import current_user, login_user, logout_user, login_required
+import psycopg2
+from psycopg2.extensions import connection as psycopg_connection
 
-current_connection = {"Engine": None}
+backend_connection: psycopg_connection = psycopg2.connect(
+    database='postgres',
+    user='postgres',
+    password='VupsenPupsen228',
+    host='0.0.0.0',
+    port='5431')
 
 logger = log.getLogger()
 
@@ -20,22 +29,16 @@ logger = log.getLogger()
 def index():
     tasks = []
     if current_user.is_authenticated:
-        with create_engine(Config.SQLALCHEMY_DATABASE_URI).connect() as connection:
-            tasks = connection.execute(text(f"SELECT "
-                                            f"task.task_id as id,"
-                                            f"c_p_id,"
-                                            f"task_decription,"
-                                            f"task_create_datetime,"
-                                            f"task_deadline_datetime,"
-                                            f"task_status_name,"
-                                            f"task_completed_datetime,"
-                                            f"task_priority "
-                                            f"FROM task "
-                                            f"JOIN task_status "
-                                            f"ON task_status.task_id=task.task_id "
-                                            f"WHERE executor={current_user.employee_id}"))
+        query = f'''
+        SELECT *
+        FROM task 
+        JOIN task_status 
+        ON task_status.task_id=task.task_id 
+        WHERE executor={current_user.employee_id}
+        '''
+        task = query_executor(query)
     if request.method == "POST":
-        with current_connection['Engine'].connect() as connection:
+        with backend_connection.connect() as connection:
             connection.execution_options(isolation_level="AUTOCOMMIT")
             connection.execute(text(f"CALL complete_task({request.form.get('task-select')});"))
         return redirect(url_for('index'))
@@ -45,6 +48,7 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    global backend_connection
     method_prefix = 'login'
 
     if current_user.is_authenticated:
@@ -63,7 +67,7 @@ def login():
         try:
             uri = f'postgresql://{form.username.data}:{form.password.data}@{Config.SQLALCHEMY_DATABASE_ADDRESS}'
             if [row[0] for row in create_engine(uri).connect().execute(text("SELECT 1"))] == [1]:
-                current_connection['Engine'] = create_engine(uri)
+                backend_connection = create_engine(uri)
         except OperationalError as e:
             log.debug(f'[{method_prefix}] Invalid username or password')
             flash('Invalid username or password')
@@ -85,7 +89,7 @@ def logout():
 def registration():
     form = RegistrationForm()
     if form.validate_on_submit():
-        with current_connection['Engine'].connect() as connection:
+        with backend_connection.connect() as connection:
             connection.execution_options(isolation_level="AUTOCOMMIT")
             connection.execute(text(f"CALL add_employee("
                                     f" '{form.post.data}',"
@@ -123,7 +127,7 @@ def create_task():
     form.good.choices = goods
 
     if form.validate_on_submit():
-        with current_connection['Engine'].connect() as connection:
+        with backend_connection.connect() as connection:
             connection.execution_options(isolation_level="AUTOCOMMIT")
             connection.execute(text(f"CALL create_task("
                                     f"{int(form.id.data)},"
@@ -154,10 +158,24 @@ def reports():
     form.id.choices = employees
 
     if form.validate_on_submit():
-        with current_connection['Engine'].connect() as connection:
+        with backend_connection.connect() as connection:
             connection.execution_options(isolation_level="AUTOCOMMIT")
             result = connection.execute(text(f"SELECT * FROM export("
                                              f"{form.id.data},"
                                              f"'{form.time_start.data}'::TIMESTAMP WITHOUT TIME ZONE,"
                                              f"'{form.time_end.data}'::TIMESTAMP WITHOUT TIME ZONE);"))
     return render_template('main_reports.html', title='Time reporting', form=form, data=list(result))
+
+
+def query_executor(query: str):
+    with backend_connection.cursor() as cursor:
+        try:
+            cursor.execute(query)
+            if cursor.pgresult_ptr is not None:
+                result = cursor.fetchall()
+        except Exception as e:
+            log.warning(f'cannot process query, e: {e}, query: {query}')
+
+    log.debug(f'processed query: {query}')
+
+    return result

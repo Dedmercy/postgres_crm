@@ -61,7 +61,7 @@ class Task(db.Model):
 
 
 class Employee(UserMixin, db.Model):
-    employee_id = db.Column(db.INTEGER, primary_key=True, index=True)
+    account_id = db.Column(db.INTEGER, primary_key=True, index=True)
     e_first_name = db.Column(db.VARCHAR(50), nullable=False)
     e_middle_name = db.Column(db.VARCHAR(50), nullable=True)
     e_last_name = db.Column(db.VARCHAR(50), nullable=False)
@@ -72,6 +72,14 @@ class Employee(UserMixin, db.Model):
     post_id = db.Column(db.INTEGER, db.ForeignKey('post.post_id'))
     creators = db.relationship('Task', backref='creators', lazy='dynamic', foreign_keys="Task.creator")
     executors = db.relationship('Task', backref='executors', lazy='dynamic', foreign_keys="Task.executor")
+
+	account_id int NOT NULL,
+	login varchar(12) NOT NULL UNIQUE,
+	hash_password varchar(256) NOT NULL,
+	role_id int NOT NULL,
+	user_data_id  int NOT NULL,
+	account_registration_date date NOT NULL,
+	last_seen_datetime timestamp NOT NULL,
 
     def get_id(self):
         return str(self.employee_id)
