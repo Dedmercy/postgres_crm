@@ -50,11 +50,12 @@ GRANT SELECT, INSERT ON task_status TO client;
 CREATE PROCEDURE delete_task (id INT)
 LANGUAGE 'sql'
 AS $$
+	DELETE FROM task_status 
+	WHERE task_id = id;
+	
 	DELETE FROM task 
 	WHERE task_id = id;
 
-	DELETE FROM task_status 
-	WHERE task_id = id;
 $$;
  	
 REVOKE ALL ON PROCEDURE delete_task FROM PUBLIC;
