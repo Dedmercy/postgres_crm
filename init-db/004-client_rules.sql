@@ -11,6 +11,7 @@ CREATE PROCEDURE create_task (
 	perk INT)
 LANGUAGE 'sql'
 AS $$
+	BEGIN;
 	INSERT INTO task (
 		task_id,
 		task_description,
@@ -35,6 +36,7 @@ AS $$
 	VALUES (
 		id,
 		'NEW');
+	COMMIT;
 $$;
  	
 REVOKE ALL ON PROCEDURE create_task FROM PUBLIC;
@@ -50,12 +52,13 @@ GRANT SELECT, INSERT ON task_status TO client;
 CREATE PROCEDURE delete_task (id INT)
 LANGUAGE 'sql'
 AS $$
+	BEGIN;
 	DELETE FROM task_status 
 	WHERE task_id = id;
 	
 	DELETE FROM task 
 	WHERE task_id = id;
-
+	COMMIT;
 $$;
  	
 REVOKE ALL ON PROCEDURE delete_task FROM PUBLIC;
@@ -73,6 +76,7 @@ CREATE PROCEDURE confirm_executor(
 	selected_task INT)
 LANGUAGE 'sql'
 AS $$
+	BEGIN;
 	UPDATE task
 	SET executor = potential_executor
 	WHERE task_id = selected_task;
@@ -80,6 +84,7 @@ AS $$
 	UPDATE task_status
 	SET task_status = 'WORK'
 	WHERE task_id = selected_task;
+	COMMIT;
 $$;
  	
 REVOKE ALL ON PROCEDURE confirm_executor FROM PUBLIC;

@@ -1,7 +1,7 @@
 GRANT SELECT, INSERT, DELETE ON service to freelancer;
 
 -- Добавление навыка пользователю.
-CREATE PROCEDURE add_perk1(
+CREATE PROCEDURE add_perk(
 	perk_id INTEGER,
 	price MONEY,
 	descr TEXT)	
