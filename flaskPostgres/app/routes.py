@@ -13,15 +13,20 @@ from sqlalchemy.exc import OperationalError
 from flask_login import current_user, login_user, logout_user, login_required
 import psycopg2
 from psycopg2.extensions import connection as psycopg_connection
+from cryptography.fernet import Fernet
 
 backend_connection: psycopg_connection = psycopg2.connect(
-    database='postgres',
+    database=Config.database,
     user='postgres',
     password='VupsenPupsen228',
-    host='0.0.0.0',
-    port='5431')
+    host=Config.host,
+    port=Config.port)
+
+user_connections = {}
 
 logger = log.getLogger()
+
+key = b'1acBq-wC927AUid7vfOHm3ldjybC_SihEZqCuTrws-c='
 
 
 @app.route('/index', methods=['GET', 'POST'])
@@ -35,24 +40,25 @@ def index():
         FROM task
         JOIN task_status
         ON task_status.task_id=task.task_id
-        WHERE executor={session['username']}
+        WHERE executor=to_regrole({session['username']});
         '''
-        task = query_executor(query)
-    # if request.method == "POST":
-    #     with backend_connection.cursor() as cursor:
-    #         connection.execution_options(isolation_level="AUTOCOMMIT")
-    #         connection.execute(text(f"CALL complete_task({request.form.get('task-select')});"))
-    #     return redirect(url_for('index'))
-
+        username = session['username']
+        tasks = query_executor(user_connections[username], query)
+    if request.method == "POST":
+        query = f'''
+        CALL complete_task({request.form.get('task-select')});'''
+        res = query_executor(user_connections[username], query)
+        return redirect(url_for('index'))
     return render_template('index.html', title='Home', tasks=list(tasks))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    global backend_connection
     method_prefix = 'login'
 
-    if current_user.is_authenticated:
+    if 'username' in session:
+        username = session['username']
+        log.debug(f'[{method_prefix}] {username} user authenticated')
         return redirect(url_for('index'))
 
     log.debug(f'[{method_prefix}] user not authenticated')
@@ -60,20 +66,33 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         log.debug(f'[{method_prefix}] form is valid')
-        employee = Employee.query.filter_by(e_nickname=form.username.data, ).first()
-        if employee is None:
-            flash('Invalid username or password')
+
+        query_find_user_by_login = f'''
+        SELECT *
+        FROM account
+        WHERE login = {form.username.data}'''
+
+        res = query_executor(backend_connection, query_find_user_by_login)
+        if len(res) == 0:
+            flash('Invalid username or password!')
             log.debug(f'[{method_prefix}] Invalid username or password')
             return redirect(url_for('login'))
+
         try:
-            uri = f'postgresql://{form.username.data}:{form.password.data}@{Config.SQLALCHEMY_DATABASE_ADDRESS}'
-            if [row[0] for row in create_engine(uri).connect().execute(text("SELECT 1"))] == [1]:
-                backend_connection = create_engine(uri)
+            user_connection: psycopg_connection = psycopg2.connect(
+                database=Config.database,
+                user=form.username.data,
+                password=form.password.data,
+                host=Config.host,
+                port=Config.port)
+
+            user_connections[form.username.data] = user_connection
+            session['username'] = form.username.data
         except OperationalError as e:
             log.debug(f'[{method_prefix}] Invalid username or password')
             flash('Invalid username or password')
             return redirect(url_for('login'))
-        login_user(employee)
+
         return redirect(url_for('index'))
     return render_template('login.html', title='Login', form=form)
 
@@ -168,7 +187,7 @@ def reports():
     return render_template('main_reports.html', title='Time reporting', form=form, data=list(result))
 
 
-def query_executor(query: str):
+def query_executor(connection, query: str):
     with backend_connection.cursor() as cursor:
         try:
             cursor.execute(query)
@@ -176,6 +195,7 @@ def query_executor(query: str):
                 result = cursor.fetchall()
         except Exception as e:
             log.warning(f'cannot process query, e: {e}, query: {query}')
+            return None
 
     log.debug(f'processed query: {query}')
 

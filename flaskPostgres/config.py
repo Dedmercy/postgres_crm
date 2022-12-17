@@ -7,3 +7,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:VupsenPupsen228@' + SQLALCHEMY_DATABASE_ADDRESS
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = True
+
+    port = '5431'
+    host = 'localhost'
+    database = 'postgres'

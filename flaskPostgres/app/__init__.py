@@ -10,13 +10,13 @@ app: Flask = Flask(__name__)
 db: SQLAlchemy = SQLAlchemy()
 app.config.from_object(Config)
 
-db.init_app(app)
-migrate = Migrate(app, db)
+# db.init_app(app)
+# migrate = Migrate(app, db)
 
 
-login = LoginManager(app)
+# login = LoginManager(app)
 
-from app.models import Employee, Post
+from app.models import Post
 from app import routes
 
 # user_datastore = SQLAlchemyUserDatastore(db, Employee, Post)

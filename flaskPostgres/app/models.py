@@ -1,7 +1,7 @@
 from app import db
 from sqlalchemy.dialects.postgresql import TIMESTAMP, SMALLINT
 from flask_login import UserMixin
-from app import login
+# from app import login
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -82,9 +82,9 @@ class Account(UserMixin, db.Model):
         return f'Employee name:{self.e_first_name},  last name:{self.e_last_name}'
 
 
-@login.user_loader
-def load_user(employee_id):
-    return Account.query.get(int(employee_id))
+# @login.user_loader
+# def load_user(employee_id):
+#     return Account.query.get(int(employee_id))
 
 
 class Contract(db.Model):
