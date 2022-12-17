@@ -60,35 +60,23 @@ class Task(db.Model):
         return f'Task №{self.contract_num}'
 
 
-class Employee(UserMixin, db.Model):
+class Account(UserMixin, db.Model):
     account_id = db.Column(db.INTEGER, primary_key=True, index=True)
-    e_first_name = db.Column(db.VARCHAR(50), nullable=False)
-    e_middle_name = db.Column(db.VARCHAR(50), nullable=True)
-    e_last_name = db.Column(db.VARCHAR(50), nullable=False)
-    e_email = db.Column(db.VARCHAR(50), nullable=False)
-    e_phone_number = db.Column(db.VARCHAR(100), nullable=False)
-    e_nickname = db.Column(db.VARCHAR(50), nullable=False)
-    e_password = db.Column(db.VARCHAR(128), nullable=False)
-    post_id = db.Column(db.INTEGER, db.ForeignKey('post.post_id'))
-    creators = db.relationship('Task', backref='creators', lazy='dynamic', foreign_keys="Task.creator")
-    executors = db.relationship('Task', backref='executors', lazy='dynamic', foreign_keys="Task.executor")
-
-	account_id int NOT NULL,
-	login varchar(12) NOT NULL UNIQUE,
-	hash_password varchar(256) NOT NULL,
-	role_id int NOT NULL,
-	user_data_id  int NOT NULL,
-	account_registration_date date NOT NULL,
-	last_seen_datetime timestamp NOT NULL,
+    login = db.Column(db.VARCHAR(12), nullable=False)
+    hash_password = db.Column(db.VARCHAR(256), nullable=False)
+    role_id = db.Column(db.INTEGER, db.ForeignKey('role.role_id'))
+    user_data_id  = db.Column(db.INTEGER, db.ForeignKey('user_personal_data.user_data_id'))
+    account_registration_date = db.Column(db.DATE, nullable=False)
+    last_seen_datetime = db.Column(db.TIMESTAMP, nullable=False)
 
     def get_id(self):
         return str(self.employee_id)
-
-    def set_password(self, password):
-        self.e_password = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.e_password, password)
+    #
+    # def set_password(self, password):
+    #     self.e_password = generate_password_hash(password)
+    #
+    # def check_password(self, password):
+    #     return check_password_hash(self.e_password, password)
 
     def __repr__(self):
         return f'Employee name:{self.e_first_name},  last name:{self.e_last_name}'
@@ -96,7 +84,7 @@ class Employee(UserMixin, db.Model):
 
 @login.user_loader
 def load_user(employee_id):
-    return Employee.query.get(int(employee_id))
+    return Account.query.get(int(employee_id))
 
 
 class Contract(db.Model):

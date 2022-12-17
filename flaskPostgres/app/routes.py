@@ -3,12 +3,12 @@ import logging as log
 import sqlalchemy.engine
 
 from app import app
-from app.models import Employee
+# from app.models import Employee
 from app.forms import RegistrationForm, LoginForm, CreationTaskForm, TimeReportForm
 from app import Config
 
 from sqlalchemy import text, create_engine
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, session
 from sqlalchemy.exc import OperationalError
 from flask_login import current_user, login_user, logout_user, login_required
 import psycopg2
@@ -27,21 +27,22 @@ logger = log.getLogger()
 @app.route('/index', methods=['GET', 'POST'])
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    tasks = []
-    if current_user.is_authenticated:
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    else:
         query = f'''
         SELECT *
-        FROM task 
-        JOIN task_status 
-        ON task_status.task_id=task.task_id 
-        WHERE executor={current_user.employee_id}
+        FROM task
+        JOIN task_status
+        ON task_status.task_id=task.task_id
+        WHERE executor={session['username']}
         '''
         task = query_executor(query)
-    if request.method == "POST":
-        with backend_connection.connect() as connection:
-            connection.execution_options(isolation_level="AUTOCOMMIT")
-            connection.execute(text(f"CALL complete_task({request.form.get('task-select')});"))
-        return redirect(url_for('index'))
+    # if request.method == "POST":
+    #     with backend_connection.cursor() as cursor:
+    #         connection.execution_options(isolation_level="AUTOCOMMIT")
+    #         connection.execute(text(f"CALL complete_task({request.form.get('task-select')});"))
+    #     return redirect(url_for('index'))
 
     return render_template('index.html', title='Home', tasks=list(tasks))
 
