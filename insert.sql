@@ -72,7 +72,7 @@ VALUES
 	
 	
 -- Вызов процедуры create_user
-CALL create_user(1::INTEGER,
+CALL create_user(
 	'Виктор',
 	'Михайлович',
 	'Резников',
@@ -82,7 +82,7 @@ CALL create_user(1::INTEGER,
 	'reznikTop1',
 	'freelancer');
 	
-CALL create_user(2,
+CALL create_user(
 	'Антон',
 	'Анатольевич',
 	'Большеротов',

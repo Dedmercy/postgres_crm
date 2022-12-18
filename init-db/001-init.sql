@@ -6,11 +6,11 @@ DROP TABLE IF EXISTS Service;
 DROP TABLE IF EXISTS Editing;
 DROP TABLE IF EXISTS Task_status;
 DROP TABLE IF EXISTS Task;
+DROP TABLE IF EXISTS User_Personal_Data;
 DROP TABLE IF EXISTS Account;
 DROP TABLE IF EXISTS Perk;
 DROP TABLE IF EXISTS Role;
 DROP TABLE IF EXISTS Spezialization;
-DROP TABLE IF EXISTS User_Personal_Data;
 
 
 
@@ -28,13 +28,11 @@ CREATE TABLE Account
 	hash_password varchar(256) NOT NULL,
 	-- Идентификатор роли
 	role_id int NOT NULL,
-	-- Идентификационный номер пользователя
-	user_data_id  int NOT NULL,
 	-- Дата регистрации
 	-- 
 	account_registration_date date NOT NULL,
 	-- Дата и время последнего входа в систему.
-	last_seen_datetime timestamp NOT NULL,
+	last_seen_datetime timestamp,
 	PRIMARY KEY (account_id)
 ) WITHOUT OIDS;
 
@@ -137,8 +135,6 @@ CREATE TABLE Task
 	task_creating_datetime timestamp NOT NULL,
 	-- Время дедлайна задания
 	task_deadline_datetime timestamp NOT NULL,
-	-- Идентификатор навыка
-	perk_id int NOT NULL,
 	PRIMARY KEY (task_id)
 ) WITHOUT OIDS;
 
@@ -159,8 +155,8 @@ CREATE TABLE Task_status
 -- Таблица, хранящая личные данные пользователя
 CREATE TABLE User_Personal_Data
 (
-	-- Идентификационный номер пользователя
-	user_data_id  int NOT NULL,
+	-- Идентификационный номер аккаунта
+	user_data_id int NOT NULL,
 	-- Имя пользователя
 	user_first_name varchar(50) NOT NULL,
 	-- Отчество/Второе имя. (Если есть)
@@ -170,7 +166,7 @@ CREATE TABLE User_Personal_Data
 	user_email varchar(50) NOT NULL,
 	-- Номер телефона
 	user_phone bigint NOT NULL,
-	PRIMARY KEY (user_data_id )
+	PRIMARY KEY (user_data_id)
 ) WITHOUT OIDS;
 
 
@@ -209,15 +205,15 @@ ALTER TABLE Task
 ;
 
 
-ALTER TABLE Service
-	ADD FOREIGN KEY (perk_id)
-	REFERENCES Perk (perk_id)
+ALTER TABLE User_Personal_Data
+	ADD FOREIGN KEY (user_data_id)
+	REFERENCES Account (account_id)
 	ON UPDATE RESTRICT
 	ON DELETE RESTRICT
 ;
 
 
-ALTER TABLE Task
+ALTER TABLE Service
 	ADD FOREIGN KEY (perk_id)
 	REFERENCES Perk (perk_id)
 	ON UPDATE RESTRICT
@@ -257,14 +253,6 @@ ALTER TABLE Task_status
 ;
 
 
-ALTER TABLE Account
-	ADD FOREIGN KEY (user_data_id )
-	REFERENCES User_Personal_Data (user_data_id )
-	ON UPDATE RESTRICT
-	ON DELETE RESTRICT
-;
-
-
 
 /* Comments */
 
@@ -273,7 +261,6 @@ COMMENT ON COLUMN Account.account_id IS 'Идентификационный но
 COMMENT ON COLUMN Account.login IS 'Логин учетной записи.';
 COMMENT ON COLUMN Account.hash_password IS 'Захешированный пароль';
 COMMENT ON COLUMN Account.role_id IS 'Идентификатор роли';
-COMMENT ON COLUMN Account.user_data_id  IS 'Идентификационный номер пользователя';
 COMMENT ON COLUMN Account.account_registration_date IS 'Дата регистрации
 ';
 COMMENT ON COLUMN Account.last_seen_datetime IS 'Дата и время последнего входа в систему.';
@@ -311,13 +298,12 @@ COMMENT ON COLUMN Task.executor IS 'Идентификационный номе�
 COMMENT ON COLUMN Task.client IS 'Идентификационный номер аккаунта клиента.';
 COMMENT ON COLUMN Task.task_creating_datetime IS 'Время создания задания';
 COMMENT ON COLUMN Task.task_deadline_datetime IS 'Время дедлайна задания';
-COMMENT ON COLUMN Task.perk_id IS 'Идентификатор навыка';
 COMMENT ON TABLE Task_status IS 'Таблица, хранящая данные о статусе заданий';
 COMMENT ON COLUMN Task_status.task_id IS 'Идентификатор задания';
 COMMENT ON COLUMN Task_status.task_complete_datetime IS 'Время и дата, когда задание стало выполненным задания.';
 COMMENT ON COLUMN Task_status.task_status IS 'Статус задания (NEW - новый, DONE - выполненный)';
 COMMENT ON TABLE User_Personal_Data IS 'Таблица, хранящая личные данные пользователя';
-COMMENT ON COLUMN User_Personal_Data.user_data_id  IS 'Идентификационный номер пользователя';
+COMMENT ON COLUMN User_Personal_Data.user_data_id IS 'Идентификационный номер аккаунта';
 COMMENT ON COLUMN User_Personal_Data.user_first_name IS 'Имя пользователя';
 COMMENT ON COLUMN User_Personal_Data.user_middle_name IS 'Отчество/Второе имя. (Если есть)';
 COMMENT ON COLUMN User_Personal_Data.user_last_name IS 'Фамилия пользователя';
