@@ -31,6 +31,7 @@ logger = log.getLogger()
 key = b'1acBq-wC927AUid7vfOHm3ldjybC_SihEZqCuTrws-c='
 
 
+
 @app.route('/index', methods=['GET', 'POST'])
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -56,6 +57,7 @@ def index():
     tasks_models = TaskModel.parse_from_query(tasks_query)
 
     return my_render_template('index.html', title='Home', tasks=list(tasks_models))
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -120,7 +122,6 @@ def login():
             log.debug(f'[{method_prefix}] Invalid username or password')
             flash('Invalid username or password')
             return redirect(url_for('login'))
-
         return redirect(url_for('index'))
     return render_template('login.html', title='Login', form=form)
 
