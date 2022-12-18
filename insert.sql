@@ -106,8 +106,15 @@ SET ROLE kebab;
  
  -- Создание задания
 CALL create_task(
-	10002, 
+	10001, 
 	'сделать видео на утренник', 
+	16559, 
+	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE, 
+	131);
+	
+	CALL create_task(
+	10002, 
+	'сделать видеоподкаст', 
 	16559, 
 	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE, 
 	131);
