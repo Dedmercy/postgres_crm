@@ -2,63 +2,54 @@
 
 {% block content %}
 <section id="content-section">
+
     <div id="greetings-container">
-        {% if current_user is not defined or current_user.is_anonymous %}
-            <h1>
-                Hello stranger. <br>
-                Please login.
-            </h1>
-        {% else %}
-            {% if current_user.is_authenticated %}
-                <h1>Hello, {{ current_user.e_first_name + " " + current_user.e_last_name }}. </h1>
-            {% endif %}
-        {% endif %}
+        <h1>Hello, {{ session['account_model'].first_name + " " + session['account_model'].last_name }}. </h1>
     </div>
-    {% if current_user.is_authenticated %}
-        {% if tasks|length == 0 %}
-            <h1>You don't have tasks</h1>
-        {% else %}
-            <h1 style="text-align: center"> Your tasks: </h1>
-            <div id="current-user-tasks">
-                {% for task in tasks %}
-                    <div class="task-container">
-                        <div class="task-header">
-                            <h2>№{{ task.id }}</h2>
-                            <p>Status: {{ task.task_status_name }}</p>
-                            <p>Priority: {{ task.task_priority }}</p>
-                        </div>
-                        {% if task.task_status_name == 'C' %}
-                        <div>
-                            <p>Completed date:{{ task. task_completed_datetime}}</p>
-                        </div>
-                        {% endif %}
-                        <div class="task-data">
-                            <p>About task: <br>{{ task.task_decription }}</p>
-                            <div>
-                                <p>Creation date: {{ task.task_create_datetime }}</p>
-                                <p>Deadline date: {{ task.task_deadline_datetime }}</p>
-                            </div>
-                        </div>
+
+    {% if tasks|length == 0 %}
+        <h1>You don't have tasks</h1>
+    {% else %}
+        <h1 style="text-align: center"> Your tasks: </h1>
+        <div id="current-user-tasks">
+            {% for task in tasks %}
+                <div class="task-container">
+                    <div class="task-header">
+                        <h2>№{{ task.id }}</h2>
+                        <p>Status: {{ task.status }}</p>
                     </div>
-                {% endfor %}
-            </div>
-            <div id="complete-task-menu-container">
-                <form action="" method="post" >
-                    <div id="complete-menu-task-header">
-                    </div>
+                    {% if task.status == 'DONE' %}
                     <div>
-                        <select id="task-select" name="task-select">
-                            {% for task in tasks %}
-                                {% if task.task_status_name != 'C' %}
-                                    <option>{{ task.id }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                        <input name="submit" type="submit" id="submit"/>
+                        <p>Completed date:{{ task.complete_date}}</p>
                     </div>
-                </form>
-            </div>
-        {% endif %}
+                    {% endif %}
+                    <div class="task-data">
+                        <p>About task: <br>{{ task.description }}</p>
+                        <div>
+                            <p>Author: {{ task.client }}</p>
+                            <p>Creation date: {{ task.creation_date }}</p>
+                            <p>Deadline date: {{ task.deadline_date }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div id="complete-task-menu-container">
+            <form action="" method="post" >
+                <div id="complete-menu-task-header">
+                </div>
+                <div>
+                    <select id="task-select" name="task-select">
+                        {% for task in tasks %}
+                            {% if task.task_status_name != 'C' %}
+                                <option>{{ task.id }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <input name="submit" type="submit" id="submit"/>
+                </div>
+            </form>
+        </div>
     {% endif %}
 </section>
 {% endblock %}

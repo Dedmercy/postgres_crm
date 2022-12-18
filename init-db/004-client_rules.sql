@@ -3,15 +3,15 @@
 
 -- CREATE TASK
 
-CREATE PROCEDURE create_task (	
+CREATE OR REPLACE PROCEDURE create_task (	
 	id INT, 
 	descr TEXT, 
 	executor INT, 
 	deadline TIMESTAMP WITHOUT TIME ZONE, 
 	perk INT)
-LANGUAGE 'sql'
+LANGUAGE plpgsql
 AS $$
-	BEGIN;
+	BEGIN
 	INSERT INTO task (
 		task_id,
 		task_description,
@@ -37,6 +37,7 @@ AS $$
 		id,
 		'NEW');
 	COMMIT;
+	END;
 $$;
  	
 REVOKE ALL ON PROCEDURE create_task FROM PUBLIC;
@@ -50,15 +51,16 @@ GRANT SELECT, INSERT ON task_status TO client;
 -- DELETE TASK
 
 CREATE PROCEDURE delete_task (id INT)
-LANGUAGE 'sql'
+LANGUAGE plpgsql
 AS $$
-	BEGIN;
+	BEGIN
 	DELETE FROM task_status 
 	WHERE task_id = id;
 	
 	DELETE FROM task 
 	WHERE task_id = id;
 	COMMIT;
+	END;
 $$;
  	
 REVOKE ALL ON PROCEDURE delete_task FROM PUBLIC;
@@ -74,9 +76,9 @@ GRANT SELECT, DELETE ON task_status TO client;
 CREATE PROCEDURE confirm_executor(	
 	potential_executor INT,
 	selected_task INT)
-LANGUAGE 'sql'
+LANGUAGE plpgsql
 AS $$
-	BEGIN;
+	BEGIN
 	UPDATE task
 	SET executor = potential_executor
 	WHERE task_id = selected_task;
@@ -85,6 +87,7 @@ AS $$
 	SET task_status = 'WORK'
 	WHERE task_id = selected_task;
 	COMMIT;
+	END;
 $$;
  	
 REVOKE ALL ON PROCEDURE confirm_executor FROM PUBLIC;

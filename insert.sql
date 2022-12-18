@@ -94,14 +94,23 @@ CALL create_user(2,
 	
 -- Проверка отзывов
 CALL create_review(
-	16549,
+	16559,
 	1001,
 	'Отличная работа'::CHARACTER VARYING(25),
 	'Выполнил работу в срок, отличное исполнение.'::TEXT,
 	10::SMALLINT);
 	
- SELECT * FROM watch_reviews(16549);
+SELECT * FROM watch_reviews(16559);
  
+SET ROLE kebab;
  
  -- Создание задания
+CALL create_task(
+	10002, 
+	'сделать видео на утренник', 
+	16559, 
+	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE, 
+	131);
+	
+RESET ROLE;
 	

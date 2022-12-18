@@ -15,8 +15,8 @@
         <header>
             <div id="header-container">
                 <div id="current-user">
-                    {% if current_user.is_authenticated %}
-                        <p>{{ current_user.e_first_name + " " + current_user.e_last_name }}</p>
+                    {% if username in session %}
+                        <p>{{ session['user_model'].first_name + " " + session['user_model'].last_name }}</p>
                     {% endif %}
                 </div>
                 <div id="box-nav-container">
@@ -24,20 +24,7 @@
                         <div class="vertical-divider"></div>
                         <ul>
                             <li><a href="{{ url_for('index') }}">Home</a></li>
-                            {% if current_user.is_anonymous %}
-                                <li><a href="{{ url_for('login') }}">Login</a></li>
-                            {% else %}
-                                <li><a href="{{ url_for('logout') }}">Logout</a></li>
-                                {% if current_user.post_id == 16484 %}
-                                    <li><a href="{{ url_for('registration') }}">Registration</a></li>
-                                    <li><a href="{{ url_for('create_task') }}">Create task</a></li>
-                                    <li><a href="{{ url_for('reports') }}">Reports</a></li>
-                                {% endif %}
-                                {% if current_user.post_id == 16485 %}
-                                    <li><a href="{{ url_for('create_task') }}">Create task</a></li>
-                                    <li><a href="{{ url_for('reports') }}">Reports</a></li>
-                                {% endif %}
-                            {% endif %}
+                            <li><a href="{{ url_for('logout') }}">Logout</a></li>
                         </ul>
                         <div class="vertical-divider"></div>
                     </div>
