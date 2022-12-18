@@ -1,6 +1,6 @@
 import logging as log
 from app import app
-from forms import RegistrationForm, LoginForm
+from app.forms import RegistrationForm, LoginForm
 from app import Config
 
 from flask import render_template, redirect, url_for, flash, request, session
@@ -8,7 +8,7 @@ from sqlalchemy.exc import OperationalError
 import psycopg2
 from psycopg2.extensions import connection as psycopg_connection
 
-from models import UserModel, TaskModel
+from app.models import UserModel, TaskModel
 
 backend_connection: psycopg_connection = psycopg2.connect(
     database=Config.database,
@@ -78,6 +78,7 @@ def login():
         '''
 
         res = query_executor(backend_connection, query_find_user_by_login)
+        print(res)
         if len(res) == 0:
             flash('Invalid username or password!')
             log.debug(f'[{method_prefix}] Invalid username or password')
@@ -125,28 +126,28 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/registration')
+@app.route('/registration', methods=['GET', 'POST'])
 def registration():
     log_prefix = 'registration'
-    log.debug(log_prefix)
+    print(log_prefix)
     form: RegistrationForm = RegistrationForm()
     if form.validate_on_submit():
         registration_query = f'''
             CALL create_user(
-                {form.first_name.data},
-                {form.middle_name.data},
-                {form.last_name.data},
-                {form.email.data},
+                '{form.first_name.data}',
+                '{form.middle_name.data}',
+                '{form.last_name.data}',
+                '{form.email.data}',
                 {form.phone.data},
-                {form.username.data},
-                {form.password.data},
-                {form.post.data});
+                '{form.username.data}',
+                '{form.password.data}',
+                '{form.post.data}')
         '''
         try:
             log.debug(f'{log_prefix} try to {registration_query}')
-            reply = query_executor(backend_connection, registration_query)
+            query_executor(backend_connection, registration_query)
         except Exception as e:
-            reply = e
+            log.debug(e)
         return redirect(url_for('index'))
 
     return render_template('registration.html', title='Registration', form=form)
@@ -158,6 +159,7 @@ def query_executor(connection, query: str):
             cursor.execute(query)
             if cursor.pgresult_ptr is not None:
                 result = cursor.fetchall()
+                connection.commit()
         except Exception as e:
             log.warning(f'cannot process query, e: {e}, query: {query}')
             return None
