@@ -21,21 +21,6 @@ CREATE PROCEDURE create_user(
 	EXECUTE FORMAT('CREATE ROLE %I LOGIN PASSWORD %L', user_nickname, user_password);
 	--	Наследуем права от соответствующей роли
 	EXECUTE FORMAT('GRANT %I TO %I', role_name, user_nickname);
-	--	Заполняем таблицу с данными учетной записи
-	INSERT INTO account(
-		account_id,
-		login,
-		hash_password,
-		role_id,
-		account_registration_date,
-		last_seen_datetime)
-	VALUES(
-		to_regrole(user_nickname),
-		user_nickname,
-		crypt(user_password, gen_salt('md5')),
-		to_regrole(role_name),
-		CURRENT_DATE,
-		CURRENT_TIMESTAMP);
 	--	Заполняем таблицу с Персональными данными
 	INSERT INTO user_personal_data(
 		user_data_id,
@@ -51,6 +36,21 @@ CREATE PROCEDURE create_user(
 		last_name,
 		email,
 		phone);
+	--	Заполняем таблицу с данными учетной записи
+	INSERT INTO account(
+		account_id,
+		login,
+		hash_password,
+		role_id,
+		account_registration_date,
+		last_seen_datetime)
+	VALUES(
+		to_regrole(user_nickname),
+		user_nickname,
+		crypt(user_password, gen_salt('md5')),
+		to_regrole(role_name),
+		CURRENT_DATE,
+		CURRENT_TIMESTAMP);
 	END;
 	$$
 	LANGUAGE plpgsql;

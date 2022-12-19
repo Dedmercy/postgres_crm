@@ -94,11 +94,28 @@ CALL create_user(
 	
 -- Проверка отзывов
 CALL create_review(
-	16559,
-	1001,
+	to_regrole('reznik')::INTEGER,
+	1,
 	'Отличная работа'::CHARACTER VARYING(25),
 	'Выполнил работу в срок, отличное исполнение.'::TEXT,
-	10::SMALLINT);
+	10::SMALLINT,
+	to_regrole('kebab')::INTEGER);
+	
+CALL create_review(
+	to_regrole('reznik')::INTEGER,
+	2,
+	'Пойдёт'::CHARACTER VARYING(25),
+	'Всё устроило.'::TEXT,
+	9::SMALLINT,
+	to_regrole('kebab')::INTEGER);
+	
+CALL create_review(
+	to_regrole('reznik')::INTEGER,
+	3,
+	'Работник дебил'::CHARACTER VARYING(25),
+	'Просрал все дедлайны'::TEXT,
+	2::SMALLINT,
+	to_regrole('kebab')::INTEGER);
 	
 SELECT * FROM watch_reviews(16559);
  
@@ -108,14 +125,14 @@ SET ROLE kebab;
 CALL create_task(
 	10001, 
 	'сделать видео на утренник', 
-	16559, 
+	to_regrole('reznik')::INTEGER, 
 	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE, 
 	131);
 	
 	CALL create_task(
 	10002, 
 	'сделать видеоподкаст', 
-	16559, 
+	to_regrole('reznik')::INTEGER, 
 	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE, 
 	131);
 	

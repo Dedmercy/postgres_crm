@@ -1,0 +1,30 @@
+{% extends "main-menu-base.html" %}
+
+{% block content %}
+<section id="content-section">
+
+    {% if reviews|length == 0 %}
+        <h1>This man don't have reviews yet</h1>
+    {% else %}
+        <h1 style="text-align: center"> Reviews: </h1>
+        <div id="reviews">
+            {% for review in reviews %}
+                <div class="review-container">
+                    <div class="review-header">
+                        <h2>Header: {{ review.header }}</h2>
+                    </div>
+
+                    <div class="review-data">
+                        <p>Text: <br>{{ review.text }}</p>
+                    </div>
+
+                    <div class="review-mark">
+                        <p>Mark: <br>{{ review.mark }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <input name="submit" type="submit" id="submit"/>
+    {% endif %}
+</section>
+{% endblock %}

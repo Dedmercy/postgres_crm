@@ -6,11 +6,11 @@ DROP TABLE IF EXISTS Service;
 DROP TABLE IF EXISTS Editing;
 DROP TABLE IF EXISTS Task_status;
 DROP TABLE IF EXISTS Task;
-DROP TABLE IF EXISTS User_Personal_Data;
 DROP TABLE IF EXISTS Account;
 DROP TABLE IF EXISTS Perk;
 DROP TABLE IF EXISTS Role;
 DROP TABLE IF EXISTS Spezialization;
+DROP TABLE IF EXISTS User_Personal_Data;
 
 
 
@@ -25,14 +25,18 @@ CREATE TABLE Account
 	-- Логин учетной записи.
 	login varchar(12) NOT NULL UNIQUE,
 	-- Захешированный пароль
-	hash_password varchar(256) NOT NULL,
+	hash_password text NOT NULL,
 	-- Идентификатор роли
 	role_id int NOT NULL,
+	-- Идентификационный номер пользователя
+	user_data_id  int NOT NULL,
 	-- Дата регистрации
 	-- 
 	account_registration_date date NOT NULL,
 	-- Дата и время последнего входа в систему.
 	last_seen_datetime timestamp,
+	-- Является ли аккаунт исполнителем или клиентом.
+	is_executor boolean NOT NULL,
 	PRIMARY KEY (account_id)
 ) WITHOUT OIDS;
 
@@ -74,11 +78,13 @@ CREATE TABLE Review
 	-- Идентификационный номер отзыва
 	review_num int NOT NULL,
 	-- Заголовок отзыва
-	review_header varchar(25),
+	review_header varchar(25) NOT NULL,
 	-- Содержание отзыва
-	review_text text,
+	review_text text NOT NULL,
 	-- Оценка. (От 1 до 10).
 	review_mark smallint NOT NULL,
+	-- Автор отзыва
+	review_author int NOT NULL,
 	PRIMARY KEY (account_id, review_num)
 ) WITHOUT OIDS;
 
@@ -155,8 +161,8 @@ CREATE TABLE Task_status
 -- Таблица, хранящая личные данные пользователя
 CREATE TABLE User_Personal_Data
 (
-	-- Идентификационный номер аккаунта
-	user_data_id int NOT NULL,
+	-- Идентификационный номер пользователя
+	user_data_id  int NOT NULL,
 	-- Имя пользователя
 	user_first_name varchar(50) NOT NULL,
 	-- Отчество/Второе имя. (Если есть)
@@ -166,7 +172,7 @@ CREATE TABLE User_Personal_Data
 	user_email varchar(50) NOT NULL,
 	-- Номер телефона
 	user_phone bigint NOT NULL,
-	PRIMARY KEY (user_data_id)
+	PRIMARY KEY (user_data_id )
 ) WITHOUT OIDS;
 
 
@@ -190,14 +196,6 @@ ALTER TABLE Service
 
 
 ALTER TABLE Task
-	ADD FOREIGN KEY (executor)
-	REFERENCES Account (account_id)
-	ON UPDATE RESTRICT
-	ON DELETE RESTRICT
-;
-
-
-ALTER TABLE Task
 	ADD FOREIGN KEY (client)
 	REFERENCES Account (account_id)
 	ON UPDATE RESTRICT
@@ -205,8 +203,8 @@ ALTER TABLE Task
 ;
 
 
-ALTER TABLE User_Personal_Data
-	ADD FOREIGN KEY (user_data_id)
+ALTER TABLE Task
+	ADD FOREIGN KEY (executor)
 	REFERENCES Account (account_id)
 	ON UPDATE RESTRICT
 	ON DELETE RESTRICT
@@ -253,6 +251,14 @@ ALTER TABLE Task_status
 ;
 
 
+ALTER TABLE Account
+	ADD FOREIGN KEY (user_data_id )
+	REFERENCES User_Personal_Data (user_data_id )
+	ON UPDATE RESTRICT
+	ON DELETE RESTRICT
+;
+
+
 
 /* Comments */
 
@@ -261,9 +267,11 @@ COMMENT ON COLUMN Account.account_id IS 'Идентификационный но
 COMMENT ON COLUMN Account.login IS 'Логин учетной записи.';
 COMMENT ON COLUMN Account.hash_password IS 'Захешированный пароль';
 COMMENT ON COLUMN Account.role_id IS 'Идентификатор роли';
+COMMENT ON COLUMN Account.user_data_id  IS 'Идентификационный номер пользователя';
 COMMENT ON COLUMN Account.account_registration_date IS 'Дата регистрации
 ';
 COMMENT ON COLUMN Account.last_seen_datetime IS 'Дата и время последнего входа в систему.';
+COMMENT ON COLUMN Account.is_executor IS 'Является ли аккаунт исполнителем или клиентом.';
 COMMENT ON COLUMN Editing.task_id IS 'Идентификатор задания';
 COMMENT ON COLUMN Editing.editing_num IS 'Идентификатор правки';
 COMMENT ON COLUMN Editing.editing_header IS 'Заголовок правки';
@@ -279,6 +287,7 @@ COMMENT ON COLUMN Review.review_num IS 'Идентификационный но�
 COMMENT ON COLUMN Review.review_header IS 'Заголовок отзыва';
 COMMENT ON COLUMN Review.review_text IS 'Содержание отзыва';
 COMMENT ON COLUMN Review.review_mark IS 'Оценка. (От 1 до 10).';
+COMMENT ON COLUMN Review.review_author IS 'Автор отзыва';
 COMMENT ON TABLE Role IS 'Таблица, хранящая данные о групповых ролях.';
 COMMENT ON COLUMN Role.role_id IS 'Идентификатор роли';
 COMMENT ON COLUMN Role.role_name IS 'Наименование роли';
@@ -303,7 +312,7 @@ COMMENT ON COLUMN Task_status.task_id IS 'Идентификатор задан�
 COMMENT ON COLUMN Task_status.task_complete_datetime IS 'Время и дата, когда задание стало выполненным задания.';
 COMMENT ON COLUMN Task_status.task_status IS 'Статус задания (NEW - новый, DONE - выполненный)';
 COMMENT ON TABLE User_Personal_Data IS 'Таблица, хранящая личные данные пользователя';
-COMMENT ON COLUMN User_Personal_Data.user_data_id IS 'Идентификационный номер аккаунта';
+COMMENT ON COLUMN User_Personal_Data.user_data_id  IS 'Идентификационный номер пользователя';
 COMMENT ON COLUMN User_Personal_Data.user_first_name IS 'Имя пользователя';
 COMMENT ON COLUMN User_Personal_Data.user_middle_name IS 'Отчество/Второе имя. (Если есть)';
 COMMENT ON COLUMN User_Personal_Data.user_last_name IS 'Фамилия пользователя';

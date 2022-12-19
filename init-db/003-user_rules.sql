@@ -8,7 +8,8 @@ CREATE PROCEDURE create_review (
 	num INT,
 	header VARCHAR(25),
 	descr TEXT,
-	mark SMALLINT)
+	mark SMALLINT,
+	author INT)
 LANGUAGE 'sql'
 AS $$
 	INSERT INTO review (
@@ -16,14 +17,16 @@ AS $$
 		review_num,
 		review_header,
 		review_text,
-		review_mark
+		review_mark,
+		review_author
 		)
 	VALUES (
 		account,
 		num,
 		header,
 		descr,
-		mark);
+		mark,
+		author);
 $$;
 
 -- Разрешить всем категориям пользователей оставлять отзывы
@@ -36,8 +39,8 @@ GRANT SELECT, INSERT ON review TO client, freelancer;
 
 -- WATCH REVIEWS
 
-CREATE FUNCTION watch_reviews (id_user INT)
-RETURNS review
+CREATE OR REPLACE FUNCTION watch_reviews (id_user INT)
+RETURNS SETOF review
 LANGUAGE 'sql'
 AS $$
 	SELECT *

@@ -10,6 +10,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/registration_styles.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/reports_styles.css') }}"/>
 </head>
+{# подключение системы всплывающих сообщений #}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 <body>
     <div class="wrapper">
         <header>

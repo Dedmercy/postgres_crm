@@ -28,11 +28,12 @@ class UserModel:
             username: str = v[1]
             hash_password: str = v[2]
             role_id: int = v[3]
-            registration_date: datetime.datetime = v[4]
-            last_seen: datetime.datetime = v[5]
-            user_data_id: int = v[6]
-            first_name: str = v[7]
-            middle_name: str = v[8]
+            user_data_id: int = v[4]
+            registration_date: datetime.datetime = v[5]
+            last_seen: datetime.datetime = v[6]
+            # user_data_id: int = v[7]
+            first_name: str = v[8]
+            middle_name: str = v[9]
             last_name: str = v[9]
             email: str = v[10]
             number: int = v[11]
@@ -115,6 +116,43 @@ class TaskModel:
         params_dict = json.loads(json_str)
         task_model = TaskModel(**params_dict)
         return task_model
+
+
+@dataclass
+class ReviewModel:
+    id: int
+    num: int
+    header: str
+    text: str
+    mark: int
+
+    @classmethod
+    def parse_from_query(cls, request_query: list) -> list:
+        review_list = []
+        for v in request_query:
+            id_: int = v[0]
+            num: int = v[1]
+            header: str = v[2]
+            text: str = v[3]
+            mark: int = v[4]
+
+            review_model = ReviewModel(id_,
+                                       num,
+                                       header,
+                                       text,
+                                       mark)
+
+            review_list.append(review_model)
+        return review_list
+
+    def to_json(self):
+        return json.dumps(self.__dict__)
+
+    @classmethod
+    def from_json(cls, json_str):
+        params_dict = json.loads(json_str)
+        review_model = ReviewModel(**params_dict)
+        return review_model
 
 
 @dataclass
