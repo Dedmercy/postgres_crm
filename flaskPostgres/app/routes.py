@@ -132,20 +132,31 @@ def registration():
     print(log_prefix)
     form: RegistrationForm = RegistrationForm()
     if form.validate_on_submit():
+
         registration_query = f'''
             CALL create_user(
-                '{form.first_name.data}',
-                '{form.middle_name.data}',
-                '{form.last_name.data}',
-                '{form.email.data}',
-                {form.phone.data},
-                '{form.username.data}',
-                '{form.password.data}',
-                '{form.post.data}')
+                %s,
+                %s,
+                %s,
+                %s,
+                %s::BIGINT,
+                %s,
+                %s,
+                %s);
         '''
+        data_from_form = (
+            form.first_name.data,
+            form.middle_name.data,
+            form.last_name.data,
+            form.email.data,
+            form.phone.data,
+            form.username.data,
+            form.password.data,
+            form.post.data,
+        )
         try:
             log.debug(f'{log_prefix} try to {registration_query}')
-            query_executor(backend_connection, registration_query)
+            query_executor(backend_connection, registration_query, data_from_form)
         except Exception as e:
             log.debug(e)
         return redirect(url_for('index'))
@@ -153,13 +164,23 @@ def registration():
     return render_template('registration.html', title='Registration', form=form)
 
 
-def query_executor(connection, query: str):
+@app.route('/create-review', methods=['GET', 'POST'])
+def create_review():
+    pass
+
+
+@app.route('/check-review', methods=['GET', 'POST'])
+def check_review():
+    pass
+
+
+def query_executor(connection, query: str, data):
     with connection.cursor() as cursor:
         try:
-            cursor.execute(query)
+            cursor.execute(query, data)
             if cursor.pgresult_ptr is not None:
                 result = cursor.fetchall()
-                connection.commit()
+            connection.commit()
         except Exception as e:
             log.warning(f'cannot process query, e: {e}, query: {query}')
             return None

@@ -1,7 +1,8 @@
+import re
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, EmailField, SelectField,\
     TelField, TextAreaField, DateTimeField, IntegerField, BooleanField
-from wtforms.validators import DataRequired, Email, EqualTo
+from wtforms.validators import DataRequired, EqualTo, ValidationError, Length
 
 
 class LoginForm(FlaskForm):
@@ -19,11 +20,34 @@ class RegistrationForm(FlaskForm):
                        validators=[DataRequired()])
     phone = TelField('Phone', validators=[DataRequired()])
     email = EmailField('Email', validators=[DataRequired()])
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired(), Length(min=5, max=12,
+                                                                          message='Length should be between 5 and 12')])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=16,
+                                                                          message='Length should be between 8 and 16')])
     confirm_password = PasswordField('Confirm your password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Registration')
 
+    def validate_email(self, field):
+        if re.fullmatch(r'([\w-]+)@([a-zA-Z]+)\.([a-zA-Z]+)', field.data) is None:
+            raise ValidationError("Wrong email")
+
+    def validate_password(self, field):
+        uppercase_letters: bool = False
+        lowercase_letters: bool = False
+        special_characters: bool = False
+        numbers: bool = False
+        if re.search(r'[a-z]', field.data) is not None:
+            lowercase_letters = True
+        if re.search(r'[A-Z]', field.data) is not None:
+            uppercase_letters = True
+        if re.search(r'[0-9]', field.data) is not None:
+            numbers = True
+        if re.search(r'[!"#$%&*+,-./:;<=>?@[\]^_`{|}]', field.data) is not None:
+            special_characters = True
+
+        if not (uppercase_letters and lowercase_letters and special_characters and numbers):
+            raise ValidationError('The password must contain lowercase and uppercase Latin letters,'
+                                  ' numbers, and special characters.')
 
 # class CreationTaskForm(FlaskForm):
 #     id = IntegerField('Task id', validators=[DataRequired()])
