@@ -1,6 +1,6 @@
 import re
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, EmailField, SelectField,\
+from wtforms import StringField, PasswordField, SubmitField, EmailField, SelectField, \
     TelField, TextAreaField, DateTimeField, IntegerField, BooleanField, FloatField
 from wtforms.validators import DataRequired, EqualTo, ValidationError, Length
 
@@ -23,7 +23,7 @@ class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=5, max=12,
                                                                           message='Length should be between 5 and 12')])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=16,
-                                                                          message='Length should be between 8 and 16')])
+                                                                            message='Length should be between 8 and 16')])
     confirm_password = PasswordField('Confirm your password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Registration')
 
@@ -51,10 +51,18 @@ class RegistrationForm(FlaskForm):
 
 
 class AddPerkForm(FlaskForm):
-    specialization = SelectField("Specialization",  choices=[])
+    specialization = SelectField("Specialization", choices=[])
     perk_id = SelectField("Perk", choices=(), coerce=int)
     money = IntegerField("Money")
     description = TextAreaField('Perk description')
+    submit = SubmitField('Submit')
+
+
+class AddReviewForm(FlaskForm):
+    review_header = StringField('Perk description')
+    review_text = TextAreaField('Perk description')
+    review_mark = SelectField("Perk", choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+
     submit = SubmitField('Submit')
 
 # class CreationTaskForm(FlaskForm):

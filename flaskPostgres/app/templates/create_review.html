@@ -1,0 +1,38 @@
+{% extends "main-menu-base.html"  %}
+
+
+{% block content %}
+    <section id="creating-review-section">
+        <h1>Create new Review</h1>
+        <p>for {{ freelancer }}</p>
+        <div id="creating-review-form-container">
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div>
+                <p>{{ form.review_header.label }}</p>
+                <div>{{ form.review_header() }}</div>
+                {% for error in form.review_header.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div>
+                <p>{{ form.review_text.label }}</p>
+                <div>{{ form.review_text() }}</div>
+                {% for error in form.review_text.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div>
+                <p>{{ form.review_mark.label }}</p>
+                <div>{{ form.review_mark() }}</div>
+                {% for error in form.review_mark.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div>
+                <div>{{ form.submit() }}</div>
+            </div>
+        </form>
+        </div>
+    </section>
+{% endblock %}

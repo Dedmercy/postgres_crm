@@ -3,7 +3,7 @@ import logging as log
 from werkzeug import Response
 
 from app import app, Config, errors
-from app.forms import RegistrationForm, LoginForm, AddPerkForm
+from app.forms import RegistrationForm, LoginForm, AddPerkForm, AddReviewForm
 from app.models import UserModel, TaskModel, SpecializationModel, ReviewModel
 
 from flask import render_template, redirect, url_for, flash, request, session, abort
@@ -239,15 +239,34 @@ def create_review(user_id):
     if logged_flag:
         return response
 
-    ####
-    # FILL
-    ####
-    # form: CreateReviewForm = CreateReviewForm()
-    # if form.validate_on_submit():
-    #
-    #     query_add_review = f'''
-    #         CALL add_review(
-    #             {form.perk_id.data},'''
+    # если была заполнена форма, то проверяет форму
+    form = AddReviewForm()
+    if form.validate_on_submit():
+
+        review_header = form.review_header.data
+        review_text = form.review_text.data
+        review_mark = form.review_mark.data
+
+        query_create_review = '''create_review (%s,%s,%s,%s,%s,%s)'''
+
+        query_review_num = '''
+        select count(*)
+        from review
+        where account_id = %s;'''
+
+        count_reviews = query_executor(user_connections[username], query_review_num, (user_id,))
+        count_reviews_int = count_reviews[0][0]
+
+        params = (user_id,
+                  count_reviews_int,
+                  review_header,
+                  review_text,
+                  review_mark,
+                  session['account_model'].account_id)
+
+        query_executor(user_connections[username], query_create_review, params)
+
+        return redirect(url_for(f'/check-review/{user_id}'))
     pass
 
 
@@ -258,12 +277,7 @@ def check_review(user_id):
         return response
 
     if request.method == "POST":
-        # query = f'''
-        #     CALL complete_task({request.form.get('task-select')});
-        # '''
-        # res = query_executor(user_connections[username], query)
-        # return redirect(url_for('index'))
-        pass
+        return redirect(url_for(f'/create-review/{user_id}'))
 
     query = f'''
         SELECT *
