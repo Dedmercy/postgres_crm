@@ -38,7 +38,7 @@ CREATE PROCEDURE create_user(
 		CURRENT_TIMESTAMP);
 	--	Заполняем таблицу с Персональными данными
 	INSERT INTO user_personal_data(
-		account_id,
+		user_data_id,
 		user_first_name,
 		user_middle_name,
 		user_last_name,

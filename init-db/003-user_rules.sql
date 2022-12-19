@@ -8,8 +8,7 @@ CREATE PROCEDURE create_review (
 	num INT,
 	header VARCHAR(25),
 	descr TEXT,
-	mark SMALLINT,
-	author INT)
+	mark SMALLINT)
 LANGUAGE 'sql'
 AS $$
 	INSERT INTO review (
@@ -17,16 +16,14 @@ AS $$
 		review_num,
 		review_header,
 		review_text,
-		review_mark,
-		review_author
+		review_mark
 		)
 	VALUES (
 		account,
 		num,
 		header,
 		descr,
-		mark,
-		author);
+		mark);
 $$;
 
 -- Разрешить всем категориям пользователей оставлять отзывы
