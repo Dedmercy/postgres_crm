@@ -1,14 +1,13 @@
 import logging as log
-from app import app
-from app.forms import RegistrationForm, LoginForm
-from app import Config
+from app import app, Config, errors
+from app.forms import RegistrationForm, LoginForm, AddPerkForm
+from app.models import UserModel, TaskModel, SpecializationModel
 
-from flask import render_template, redirect, url_for, flash, request, session
+from flask import render_template, redirect, url_for, flash, request, session, abort
 from sqlalchemy.exc import OperationalError
 import psycopg2
 from psycopg2.extensions import connection as psycopg_connection
 
-from app.models import UserModel, TaskModel
 
 backend_connection: psycopg_connection = psycopg2.connect(
     database=Config.database,
@@ -34,22 +33,24 @@ def index():
 
     if username not in user_connections.keys():
         return redirect(url_for('login'))
+    if session['account_model']['role_id'] == 16498:
+        if request.method == "POST":
+            query = f'''
+                CALL complete_task({request.form.get('task-select')});
+            '''
+            res = query_executor(user_connections[username], query)
+            return redirect(url_for('index'))
 
-    if request.method == "POST":
         query = f'''
-            CALL complete_task({request.form.get('task-select')});
+            SELECT *
+            FROM current_user_tasks_information
         '''
-        res = query_executor(user_connections[username], query)
-        return redirect(url_for('index'))
+        tasks_query = query_executor(user_connections[username], query)
+        tasks_models = TaskModel.parse_from_query(tasks_query)
 
-    query = f'''
-    SELECT *
-    FROM current_user_tasks_information
-    '''
-    tasks_query = query_executor(user_connections[username], query)
-    tasks_models = TaskModel.parse_from_query(tasks_query)
-
-    return my_render_template('index.html', title='Home', tasks=list(tasks_models))
+        return my_render_template('index.html', title='Home', tasks=list(tasks_models))
+    else:
+        return my_render_template('index.html', title='Home', tasks=[])
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -78,7 +79,6 @@ def login():
         '''
 
         res = query_executor(backend_connection, query_find_user_by_login)
-        print(res)
         if len(res) == 0:
             flash('Invalid username or password!')
             log.debug(f'[{method_prefix}] Invalid username or password')
@@ -129,39 +129,100 @@ def logout():
 @app.route('/registration', methods=['GET', 'POST'])
 def registration():
     log_prefix = 'registration'
-    print(log_prefix)
+
+    if 'username' in session:
+        username = session['username']
+        if username in user_connections.keys():
+            log.debug(f'[{log_prefix}] {username} user authenticated')
+            return redirect(url_for('index'))
+
     form: RegistrationForm = RegistrationForm()
     if form.validate_on_submit():
 
         registration_query = f'''
             CALL create_user(
-                %s,
-                %s,
-                %s,
-                %s,
-                %s::BIGINT,
-                %s,
-                %s,
-                %s);
+                '{form.first_name.data}',
+                '{form.middle_name.data}',
+                '{form.last_name.data}',
+                '{form.email.data}',
+                {form.phone.data},
+                '{form.username.data}',
+                '{form.password.data}',
+                '{form.post.data}');
         '''
-        data_from_form = (
-            form.first_name.data,
-            form.middle_name.data,
-            form.last_name.data,
-            form.email.data,
-            form.phone.data,
-            form.username.data,
-            form.password.data,
-            form.post.data,
-        )
         try:
             log.debug(f'{log_prefix} try to {registration_query}')
-            query_executor(backend_connection, registration_query, data_from_form)
+            query_executor(backend_connection, registration_query)
         except Exception as e:
             log.debug(e)
+
         return redirect(url_for('index'))
 
     return render_template('registration.html', title='Registration', form=form)
+
+
+@app.route('/perks', methods=['GET', 'POST'])
+def perks():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    username = session['username']
+
+    if username not in user_connections.keys():
+        return redirect(url_for('login'))
+
+    if session['account_model']['role_id'] != 16498:
+        abort(403)
+
+    form: AddPerkForm = AddPerkForm()
+    print(user_connections)
+
+    query_find_all_spezializations = f'''
+        SELECT * FROM spezialization;
+    '''
+
+    query_find_all_perks = f'''
+        SELECT * FROM perk
+        WHERE perk_id NOT IN (
+                SELECT perk_id FROM service
+                WHERE account_id = to_regrole('{username}')
+            );
+    '''
+
+    query_current_user_perks = f'''
+        SELECT 
+            perk.perk_name,
+            service.price,
+            service.description 
+        FROM service
+        JOIN perk
+        ON perk.perk_id = service.perk_id
+        WHERE account_id = to_regrole('{username}');
+    '''
+
+    all_spezializations = query_executor(backend_connection, query_find_all_spezializations)
+    all_perks = query_executor(backend_connection, query_find_all_perks)
+    current_user_perks = query_executor(backend_connection, query_current_user_perks)
+
+    form.specialization.choices = all_spezializations
+
+    if request.method == 'POST':
+
+        query_add_perk = f'''
+            CALL add_perk(
+            {form.perk_id.data},
+            {form.money.data}::MONEY,
+            '{form.description.data}'::TEXT
+            );
+        '''
+        print(query_add_perk)
+        try:
+            query_executor(user_connections[username], query_add_perk)
+        except Exception as e:
+            print(e)
+
+    return render_template('perks.html', form=form,  current_user=session['account_model'],
+                           perks=all_perks, current_user_perks=current_user_perks)
 
 
 @app.route('/create-review', methods=['GET', 'POST'])
@@ -174,13 +235,29 @@ def check_review():
     pass
 
 
-def query_executor(connection, query: str, data):
+@app.route('/create-tast', methods=['GET', 'POST'])
+def create_task():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    username = session['username']
+
+    if username not in user_connections.keys():
+        return redirect(url_for('login'))
+
+    if session['account_model']['role_id'] != 16497:
+        abort(403)
+
+    print(session['account-model'])
+
+
+def query_executor(connection, query: str):
     with connection.cursor() as cursor:
         try:
-            cursor.execute(query, data)
+            connection.autocommit = True
+            cursor.execute(query)
             if cursor.pgresult_ptr is not None:
                 result = cursor.fetchall()
-            connection.commit()
         except Exception as e:
             log.warning(f'cannot process query, e: {e}, query: {query}')
             return None

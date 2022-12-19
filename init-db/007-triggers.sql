@@ -9,7 +9,7 @@ LANGUAGE plpgsql
 AS $$
     BEGIN
         -- Цена услуги должна быть больше 0
-        IF NEW.price < 0 THEN
+        IF CAST (NEW.price as NUMERIC) < 0 THEN
             RAISE EXCEPTION 'service cannot have a negative cost';
         END IF;
 		

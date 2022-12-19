@@ -1,7 +1,7 @@
 import re
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, EmailField, SelectField,\
-    TelField, TextAreaField, DateTimeField, IntegerField, BooleanField
+    TelField, TextAreaField, DateTimeField, IntegerField, BooleanField, FloatField
 from wtforms.validators import DataRequired, EqualTo, ValidationError, Length
 
 
@@ -48,6 +48,14 @@ class RegistrationForm(FlaskForm):
         if not (uppercase_letters and lowercase_letters and special_characters and numbers):
             raise ValidationError('The password must contain lowercase and uppercase Latin letters,'
                                   ' numbers, and special characters.')
+
+
+class AddPerkForm(FlaskForm):
+    specialization = SelectField("Specialization",  choices=[])
+    perk_id = SelectField("Perk", choices=(), coerce=int)
+    money = IntegerField("Money")
+    description = TextAreaField('Perk description')
+    submit = SubmitField('Submit')
 
 # class CreationTaskForm(FlaskForm):
 #     id = IntegerField('Task id', validators=[DataRequired()])

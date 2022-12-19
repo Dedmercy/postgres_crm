@@ -115,3 +115,23 @@ class TaskModel:
         params_dict = json.loads(json_str)
         task_model = TaskModel(**params_dict)
         return task_model
+
+
+@dataclass
+class SpecializationModel:
+    sp_id: int
+    sp_name: str
+
+    @classmethod
+    def parse_from_query(cls, request_query: list) -> list:
+        task_list = []
+        for item in request_query:
+            id: int = item[0]
+            name: str = item[1]
+
+            specialization_model = SpecializationModel(
+                id,
+                name
+            )
+            task_list.append(specialization_model)
+        return task_list

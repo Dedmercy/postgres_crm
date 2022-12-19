@@ -1,0 +1,79 @@
+{% extends "main-menu-base.html"%}
+
+{% block content %}
+    <script defer>
+        function chooseSpecialization(){
+            let specializationSelect = document.getElementById("specialization");
+            let perkSelect = document.getElementById("perk_id");
+            document.querySelector('#perk_id').innerHTML = '';
+            let allPerks = {{ perks|tojson }};
+            for(let i =0; i < 40; i +=1){
+                if (allPerks[i][2] === Number(specializationSelect.value)){
+                    let opt = document.createElement('option')
+                    opt.textContent = allPerks[i][1]
+                    opt.value = allPerks[i][0]
+                    console.log(typeof(allPerks[i][0]))
+                    perkSelect.appendChild(opt)
+                }
+            }
+        }
+
+    </script>
+    <div class="main-box">
+        <section id="freelancer-info-section">
+            <div id="freelancer-data">
+                <p>Name: {{ current_user['first_name'] }}</p>
+                <p>Middle name: {{current_user['middle_name']}}</p>
+                <p>Last name: {{current_user['last_name']}}</p>
+                <p>Registration date: {{current_user['registration_date']}}</p>
+                <p>Email: {{current_user['email']}}</p>
+                <p>Phone: {{ current_user['number'] }}</p>
+            </div>
+            <div>
+                <a> Your perks</a>
+                {% for item in current_user_perks %}
+                    <div class="current_user-perks">
+                        <p>{{ item[0]}}</p>
+                        <p>Cost: {{ item[1]}}</p>
+                        <p>Description {{ item[2] }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+        <section id="add-perk-form-section">
+            <form action="" novalidate method="post">
+                <div>
+                    <p>{{ form.specialization.label }}</p>
+                    <div>{{ form.specialization(onclick="chooseSpecialization()") }}</div>
+                    {% for error in form.specialization.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    <p>{{ form.perk_id.label }}</p>
+                    <div>{{ form.perk_id() }}</div>
+                    {% for error in form.perk_id.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    <p>{{ form.money.label }}</p>
+                    <div>{{ form.money() }}</div>
+                    {% for error in form.money.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    <p>{{ form.description.label }}</p>
+                    <div>{{ form.description() }}</div>
+                    {% for error in form.description.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    {{ form.submit() }}
+                </div>
+            </form>
+        </section>
+    </div>
+{% endblock %}
