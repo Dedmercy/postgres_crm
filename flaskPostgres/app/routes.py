@@ -200,11 +200,11 @@ def perks():
         WHERE account_id = to_regrole('{username}');
     '''
 
-    all_spezializations = query_executor(backend_connection, query_find_all_spezializations)
+    all_speсializations = query_executor(backend_connection, query_find_all_spezializations)
     all_perks = query_executor(backend_connection, query_find_all_perks)
     current_user_perks = query_executor(backend_connection, query_current_user_perks)
 
-    form.specialization.choices = all_spezializations
+    form.specialization.choices = all_speсializations
 
     if request.method == 'POST':
 
@@ -220,6 +220,7 @@ def perks():
             query_executor(user_connections[username], query_add_perk)
         except Exception as e:
             print(e)
+        return redirect(url_for('perks'))
 
     return render_template('perks.html', form=form,  current_user=session['account_model'],
                            perks=all_perks, current_user_perks=current_user_perks)
