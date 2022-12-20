@@ -1,15 +1,13 @@
 import logging as log
-
-from werkzeug import Response
-
 from app import app, Config, errors
-from app.forms import RegistrationForm, LoginForm, AddPerkForm, AddReviewForm
-from app.models import UserModel, TaskModel, SpecializationModel, ReviewModel
+from app.forms import RegistrationForm, LoginForm, AddPerkForm
+from app.models import UserModel, TaskModel, SpecializationModel
 
 from flask import render_template, redirect, url_for, flash, request, session, abort
 from sqlalchemy.exc import OperationalError
 import psycopg2
 from psycopg2.extensions import connection as psycopg_connection
+
 
 backend_connection: psycopg_connection = psycopg2.connect(
     database=Config.database,
@@ -28,24 +26,26 @@ key = b'1acBq-wC927AUid7vfOHm3ldjybC_SihEZqCuTrws-c='
 @app.route('/index', methods=['GET', 'POST'])
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    logged_flag, username, response = check_user_logged()
-    if logged_flag:
-        return response
+    if 'username' not in session:
+        return redirect(url_for('login'))
 
-    if session['account_model']['role_id'] == 16503:
+    username = session['username']
+
+    if username not in user_connections.keys():
+        return redirect(url_for('login'))
+    if session['account_model']['role_id'] == 16498:
         if request.method == "POST":
-            task_id = request.form.get('task-select')
             query = f'''
-                CALL complete_task(%s);
+                CALL complete_task({request.form.get('task-select')});
             '''
-            res = query_executor(user_connections[username], query, (task_id,))
+            res = query_executor(user_connections[username], query)
             return redirect(url_for('index'))
 
         query = f'''
             SELECT *
             FROM current_user_tasks_information
         '''
-        tasks_query = query_executor(user_connections[username], query, ())
+        tasks_query = query_executor(user_connections[username], query)
         tasks_models = TaskModel.parse_from_query(tasks_query)
 
         return my_render_template('index.html', title='Home', tasks=list(tasks_models))
@@ -71,16 +71,14 @@ def login():
     if form.validate_on_submit():
         log.debug(f'[{method_prefix}] form is valid')
 
-        username = form.username.data
-
         # проверяет наличие юзера с таким логином
         query_find_user_by_login = f'''
             SELECT *
             FROM account
-            WHERE login = %s
+            WHERE login = '{form.username.data}'
         '''
 
-        res = query_executor(backend_connection, query_find_user_by_login, (username,))
+        res = query_executor(backend_connection, query_find_user_by_login)
         if len(res) == 0:
             flash('Invalid username or password!')
             log.debug(f'[{method_prefix}] Invalid username or password')
@@ -105,12 +103,12 @@ def login():
                 SELECT *
                 FROM account
                 JOIN user_personal_data 
-                ON account.user_data_id = user_personal_data.user_data_id
+                ON account.account_id = user_personal_data.user_data_id
                 WHERE account.account_id = to_regrole('{username}');
             '''
 
             # сохраняет в куки
-            account_info = query_executor(backend_connection, query_account_info, ())
+            account_info = query_executor(backend_connection, query_account_info)
             account_model: UserModel = UserModel.parse_from_query(account_info)[0]
             session['account_model'] = account_model.to_simple_formats()
             session.modified = True
@@ -118,10 +116,6 @@ def login():
             log.debug(f'[{method_prefix}] Invalid username or password')
             flash('Invalid username or password')
             return redirect(url_for('login'))
-        except Exception as e:
-            flash(str(e))
-            return redirect(url_for('login'))
-
         return redirect(url_for('index'))
     return render_template('login.html', title='Login', form=form)
 
@@ -129,7 +123,6 @@ def login():
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.pop('username')
-    session.pop('account_model')
     return redirect(url_for('index'))
 
 
@@ -146,21 +139,20 @@ def registration():
     form: RegistrationForm = RegistrationForm()
     if form.validate_on_submit():
 
-        form_params = (form.first_name.data,
-                       form.middle_name.data,
-                       form.last_name.data,
-                       form.email.data,
-                       form.phone.data,
-                       form.username.data,
-                       form.password.data,
-                       form.post.data)
-
         registration_query = f'''
-            CALL create_user(%s, %s, %s, %s, %s, %s, %s, %s);
+            CALL create_user(
+                '{form.first_name.data}',
+                '{form.middle_name.data}',
+                '{form.last_name.data}',
+                '{form.email.data}',
+                {form.phone.data},
+                '{form.username.data}',
+                '{form.password.data}',
+                '{form.post.data}');
         '''
         try:
             log.debug(f'{log_prefix} try to {registration_query}')
-            query_executor(backend_connection, registration_query, form_params)
+            query_executor(backend_connection, registration_query)
         except Exception as e:
             log.debug(e)
 
@@ -171,9 +163,13 @@ def registration():
 
 @app.route('/perks', methods=['GET', 'POST'])
 def perks():
-    logged_flag, username, response = check_user_logged()
-    if logged_flag:
-        return response
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    username = session['username']
+
+    if username not in user_connections.keys():
+        return redirect(url_for('login'))
 
     if session['account_model']['role_id'] != 16498:
         abort(403)
@@ -189,7 +185,7 @@ def perks():
         SELECT * FROM perk
         WHERE perk_id NOT IN (
                 SELECT perk_id FROM service
-                WHERE account_id = to_regrole(%s)
+                WHERE account_id = to_regrole('{username}')
             );
     '''
 
@@ -201,92 +197,41 @@ def perks():
         FROM service
         JOIN perk
         ON perk.perk_id = service.perk_id
-        WHERE account_id = to_regrole(%s);
+        WHERE account_id = to_regrole('{username}');
     '''
 
-    all_specializations = query_executor(backend_connection, query_find_all_spezializations, ())
-    all_perks = query_executor(backend_connection, query_find_all_perks, (username,))
-    current_user_perks = query_executor(backend_connection, query_current_user_perks, (username,))
+    all_spezializations = query_executor(backend_connection, query_find_all_spezializations)
+    all_perks = query_executor(backend_connection, query_find_all_perks)
+    current_user_perks = query_executor(backend_connection, query_current_user_perks)
 
-    form.specialization.choices = all_specializations
+    form.specialization.choices = all_spezializations
 
     if request.method == 'POST':
 
         query_add_perk = f'''
             CALL add_perk(
-            %s,
-            %s::MONEY,
-            %s::TEXT
+            {form.perk_id.data},
+            {form.money.data}::MONEY,
+            '{form.description.data}'::TEXT
             );
         '''
-        perk_data = (form.perk_id.data,
-                     form.money.data,
-                     form.description.data)
         print(query_add_perk)
         try:
-            query_executor(user_connections[username], query_add_perk, perk_data)
+            query_executor(user_connections[username], query_add_perk)
         except Exception as e:
             print(e)
-        return redirect(url_for('perks'))
 
-    return render_template('perks.html', form=form, current_user=session['account_model'],
+    return render_template('perks.html', form=form,  current_user=session['account_model'],
                            perks=all_perks, current_user_perks=current_user_perks)
 
 
-@app.route('/create-review/<user_id>', methods=['GET', 'POST'])
-def create_review(user_id):
-    logged_flag, username, response = check_user_logged()
-    if logged_flag:
-        return response
-
-    # если была заполнена форма, то проверяет форму
-    form = AddReviewForm()
-    if form.validate_on_submit():
-
-        review_header = form.review_header.data
-        review_text = form.review_text.data
-        review_mark = form.review_mark.data
-
-        query_create_review = '''create_review (%s,%s,%s,%s,%s,%s)'''
-
-        query_review_num = '''
-        select count(*)
-        from review
-        where account_id = %s;'''
-
-        count_reviews = query_executor(user_connections[username], query_review_num, (user_id,))
-        count_reviews_int = count_reviews[0][0]
-
-        params = (user_id,
-                  count_reviews_int,
-                  review_header,
-                  review_text,
-                  review_mark,
-                  session['account_model'].account_id)
-
-        query_executor(user_connections[username], query_create_review, params)
-
-        return redirect(url_for(f'/check-review/{user_id}'))
+@app.route('/create-review', methods=['GET', 'POST'])
+def create_review():
     pass
 
 
-@app.route('/check-review/<user_id>', methods=['GET', 'POST'])
-def check_review(user_id):
-    logged_flag, username, response = check_user_logged()
-    if logged_flag:
-        return response
-
-    if request.method == "POST":
-        return redirect(url_for(f'/create-review/{user_id}'))
-
-    query = f'''
-        SELECT *
-        FROM watch_reviews(%s)
-    '''
-    reviews_query = query_executor(user_connections[username], query, (user_id,))
-    reviews_models = ReviewModel.parse_from_query(reviews_query)
-
-    return my_render_template('reviews.html', title='Home', reviews=list(reviews_models))
+@app.route('/check-review', methods=['GET', 'POST'])
+def check_review():
     pass
 
 
@@ -306,11 +251,11 @@ def create_task():
     print(session['account-model'])
 
 
-def query_executor(connection, query: str, params: tuple):
+def query_executor(connection, query: str):
     with connection.cursor() as cursor:
         try:
             connection.autocommit = True
-            cursor.execute(query, params)
+            cursor.execute(query)
             if cursor.pgresult_ptr is not None:
                 result = cursor.fetchall()
         except Exception as e:
@@ -334,15 +279,3 @@ def my_render_template(template, *args: tuple, **kwargs):
     args = list(args)
     args.insert(0, template)
     return render_template(*args, **kwargs)
-
-
-def check_user_logged() -> (bool, str, Response):
-    if 'username' not in session:
-        return True, None, redirect(url_for('login'))
-
-    username = session['username']
-
-    if username not in user_connections.keys():
-        return True, None, redirect(url_for('login'))
-
-    return False, username, None
