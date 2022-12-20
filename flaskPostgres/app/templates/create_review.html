@@ -4,7 +4,7 @@
 {% block content %}
     <section id="creating-review-section">
         <h1>Create new Review</h1>
-        <p>for {{ freelancer }}</p>
+        <p>for {{ current_user['last_name'] + ' ' + current_user['first_name'] + ' ' +  current_user['middle_name'] }}</p>
         <div id="creating-review-form-container">
         <form action="" method="post" novalidate>
             {{ form.hidden_tag() }}

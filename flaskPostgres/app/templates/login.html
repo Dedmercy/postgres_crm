@@ -5,14 +5,16 @@
     <title>{{ title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/login_styles.css') }}"/>
 </head>
+
+
 {# подключение системы всплывающих сообщений #}
 {% with messages = get_flashed_messages() %}
   {% if messages %}
-    <ul class=flashes>
     {% for message in messages %}
-      <li>{{ message }}</li>
+        <script>
+            window.alert("{{ message }}");
+        </script>
     {% endfor %}
-    </ul>
   {% endif %}
 {% endwith %}
 <body>

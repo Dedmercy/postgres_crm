@@ -204,7 +204,7 @@ def perks():
     if logged_flag:
         return response
 
-    if session['account_model']['role_id'] != 'freelancer':
+    if session['account_model']['role'] != 'freelancer':
         abort(403)
 
     form: AddPerkForm = AddPerkForm()
@@ -266,11 +266,15 @@ def task_reports():
     return render_template("task_reports.html", current_user=session['account_model'])
 
 
-@app.route('/create-review/<user_id>', methods=['GET', 'POST'])
-def create_review(user_id):
+@app.route('/create-review/<user_login>', methods=['GET', 'POST'])
+def create_review(user_login):
     logged_flag, username, response = check_user_logged()
     if logged_flag:
         return response
+
+    if user_login == username:
+        return redirect(f'/check-review/{user_login}')
+
 
     # если была заполнена форма, то проверяет форму
     form = AddReviewForm()
@@ -279,47 +283,42 @@ def create_review(user_id):
         review_text = form.review_text.data
         review_mark = form.review_mark.data
 
-        query_create_review = '''create_review (%s,%s,%s,%s,%s,%s)'''
+        query_create_review = '''CALL create_review (to_regrole(%s)::INT,%s,%s,%s::SMALLINT)'''
 
-        query_review_num = '''
-        select count(*)
-        from review
-        where account_id = %s;'''
-
-        count_reviews = query_executor(user_connections[username], query_review_num, (user_id,))
-        count_reviews_int = count_reviews[0][0]
-
-        params = (user_id,
-                  count_reviews_int,
+        params = (user_login,
                   review_header,
                   review_text,
-                  review_mark,
-                  session['account_model'].account_id)
+                  review_mark)
 
-        query_executor(user_connections[username], query_create_review, params)
+        try:
+            query_executor(user_connections[username], query_create_review, params)
+            flash('Успешно!')
+        except Exception as e:
+            flash(str(e))
 
-        return redirect(url_for(f'/check-review/{user_id}'))
+        return redirect(f'/check-review/{user_login}')
 
-    return parametrized_render_template('create_review.html')
+    return parametrized_render_template('create_review.html', form=form)
 
 
-@app.route('/check-review/<user_id>', methods=['GET', 'POST'])
-def check_review(user_id):
+@app.route('/check-review/<user_login>', methods=['GET', 'POST'])
+def check_review(user_login):
     logged_flag, username, response = check_user_logged()
     if logged_flag:
         return response
 
     if request.method == "POST":
-        return redirect(url_for(f'/create-review/{user_id}'))
+        return redirect(f'/create-review/{user_login}')
 
     query = f'''
         SELECT *
-        FROM watch_reviews(%s)
+        FROM watch_reviews(to_regrole(%s)::INT)
     '''
-    reviews_query = query_executor(user_connections[username], query, (user_id,))
+    reviews_query = query_executor(user_connections[username], query, (user_login,))
     reviews_models = ReviewModel.parse_from_query(reviews_query)
 
-    return parametrized_render_template('reviews.html', title='Home', reviews=list(reviews_models))
+    return parametrized_render_template('reviews.html', title='Home', reviews=list(reviews_models),
+                                        watched_user=user_login)
 
 
 @app.route('/create-task', methods=['GET', 'POST'])
@@ -407,19 +406,28 @@ def create_task():
 
 
 def query_executor(connection, query: str, params: tuple):
+    # with connection.cursor() as cursor:
+    #     try:
+    #         connection.autocommit = True
+    #         cursor.execute(query, params)
+    #         result = None
+    #         if cursor.pgresult_ptr is not None:
+    #             result = cursor.fetchall()
+    #         log.debug(f'processed query: {query}')
+    #         return result
+    #     except Exception as e:
+    #         log.warning(f'cannot process query, e: {e}, query: {query}')
+    #         return None
+    result = None
+
     with connection.cursor() as cursor:
-        try:
-            connection.autocommit = True
-            cursor.execute(query, params)
-            if cursor.pgresult_ptr is not None:
-                result = cursor.fetchall()
-        except Exception as e:
-            log.warning(f'cannot process query, e: {e}, query: {query}')
-            return None
+        connection.autocommit = True
+        cursor.execute(query, params)
+        if cursor.pgresult_ptr is not None:
+            result = cursor.fetchall()
 
-    log.debug(f'processed query: {query}')
-
-    return result
+        log.debug(f'processed query: {query}')
+        return result
 
 
 def get_user_connection(user: str):

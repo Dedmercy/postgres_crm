@@ -22,7 +22,7 @@ class RegistrationForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired()])
     username = StringField('Username', validators=[DataRequired(),
                                                    Length(min=5, max=12,
-                                                            message='Length should be between 5 and 12')])
+                                                          message='Length should be between 5 and 12')])
     password = PasswordField('Password', validators=[DataRequired(),
                                                      Length(min=8, max=16,
                                                             message='Length should be between 8 and 16')])
@@ -65,11 +65,12 @@ class CreationTaskForm(FlaskForm):
     executor = IntegerField('Choose freelancer', validators=[DataRequired()])
     deadline = StringField('Deadline', validators=[DataRequired()])
     description = TextAreaField('Task description')
-    
+
+
 class AddReviewForm(FlaskForm):
-    review_header = StringField('Perk description')
-    review_text = TextAreaField('Perk description')
-    review_mark = SelectField("Perk", choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+    review_header = StringField('Заголовок отзыва')
+    review_text = TextAreaField('Описание отзыва')
+    review_mark = SelectField("Оценка", choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
 
     submit = SubmitField('Submit')
 
