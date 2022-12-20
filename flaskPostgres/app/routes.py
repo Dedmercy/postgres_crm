@@ -204,7 +204,7 @@ def perks():
     if logged_flag:
         return response
 
-    if session['account_model']['role_id'] != 'freelancer':
+    if session['account_model']['role'] != 'freelancer':
         abort(403)
 
     form: AddPerkForm = AddPerkForm()
@@ -332,7 +332,7 @@ def create_task():
     if username not in user_connections.keys():
         return redirect(url_for('login'))
 
-    if session['account_model']['role_id'] != 16499:
+    if session['account_model']['role'] != 'client':
         abort(403)
 
     creation_form = CreationTaskForm()
