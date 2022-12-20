@@ -7,7 +7,7 @@ CREATE OR REPLACE PROCEDURE create_task (
 	deadline TIMESTAMP WITHOUT TIME ZONE)
 LANGUAGE plpgsql
 AS $$
-	BEGIN
+BEGIN	
 	INSERT INTO task (
 		task_id,
 		task_description,
@@ -23,15 +23,15 @@ AS $$
 		to_regrole(CURRENT_USER),
 		CURRENT_TIMESTAMP,
 		deadline);
-	 INSERT INTO task_status (
+		
+	INSERT INTO task_status (
 		task_id,
 		task_status
 		)
 	VALUES (
 		id,
 		'NEW');
-	COMMIT;
-	END;
+END;
 $$;
  	
 REVOKE ALL ON PROCEDURE create_task FROM PUBLIC;
@@ -69,6 +69,15 @@ CREATE PROCEDURE confirm_executor(
 LANGUAGE plpgsql
 AS $$
 	BEGIN
+	
+	SAVEPOINT started;
+	
+	--IF (SELECT COUNT(*)
+	--	FROM task
+	--	WHERE executor = potential_executor) > 5 THEN
+	--	ROLLBACK TO SAVEPOINT started;
+	--END IF;
+	
 	UPDATE task
 	SET executor = potential_executor
 	WHERE task_id = selected_task;
@@ -76,6 +85,7 @@ AS $$
 	UPDATE task_status
 	SET task_status = 'WORK'
 	WHERE task_id = selected_task;
+	
 	COMMIT;
 	END;
 $$;
