@@ -1,0 +1,54 @@
+#perk-page-main-box{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+#perk-page-main-box section{
+    margin: 20px;
+    width: 50%;
+
+}
+
+#personal-data-container, .current-user-perk, #add-perk-form-section{
+    padding: 10px;
+    background-color: #F6F8FA;
+    border: 1px solid #D8DEE4;
+    border-radius: 5px;
+}
+
+#add-perk-form-section form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#add-perk-form-section form div{
+    width: 90%;
+    margin: 0 10px;
+}
+
+#add-perk-form-section select, input, textarea{
+    width: 100%;
+}
+
+#add-perk-form-section #add-perk-form-submit-box{
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+#add-perk-form-submit-box #submit{
+    height: 30px;
+    width: 50%;
+    padding: 0;
+    margin: 0 auto;
+}
+
+.current-user-perk{
+    margin-top: 10px;
+}
+
+h1{
+    text-align: center;
+}

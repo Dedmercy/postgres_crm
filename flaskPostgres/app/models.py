@@ -10,7 +10,7 @@ class UserModel:
     username: str
     hash_password: str
     role_id: int
-    registration_date: datetime.datetime
+    registration_date: datetime.date
     last_seen: datetime.datetime
     first_name: str
     middle_name: str
