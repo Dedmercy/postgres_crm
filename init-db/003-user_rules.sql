@@ -36,8 +36,8 @@ GRANT SELECT, INSERT ON review TO client, freelancer;
 
 -- WATCH REVIEWS
 
-CREATE FUNCTION watch_reviews (id_user INT)
-RETURNS review
+CREATE OR REPLACE FUNCTION watch_reviews (id_user INT)
+RETURNS SETOF review
 LANGUAGE 'sql'
 AS $$
 	SELECT *
