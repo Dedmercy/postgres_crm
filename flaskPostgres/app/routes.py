@@ -52,7 +52,7 @@ def index():
         '''
 
     # Если пользователь заказчик
-    elif session['account_model']['role_id'] == 'client':
+    elif session['account_model']['role'] == 'client':
         query = f'''
                     SELECT *
                     FROM current_client_tasks_information
@@ -275,7 +275,6 @@ def create_review(user_login):
     if user_login == username:
         return redirect(f'/check-review/{user_login}')
 
-
     # если была заполнена форма, то проверяет форму
     form = AddReviewForm()
     if form.validate_on_submit():
@@ -323,15 +322,11 @@ def check_review(user_login):
 
 @app.route('/create-task', methods=['GET', 'POST'])
 def create_task():
-    if 'username' not in session:
-        return redirect(url_for('login'))
+    logged_flag, username, response = check_user_logged()
+    if logged_flag:
+        return response
 
-    username = session['username']
-
-    if username not in user_connections.keys():
-        return redirect(url_for('login'))
-
-    if session['account_model']['role_id'] != 16499:
+    if session['account_model']['role'] != 'client':
         abort(403)
 
     creation_form = CreationTaskForm()
@@ -376,9 +371,9 @@ def create_task():
 
             services = query_executor(backend_connection, query_find_suitable_freelancer,
                                       (find_freelancer_form.perk.data,))
-            return render_template("creation_task.html", current_user=session['account_model'],
-                                   main_form=creation_form, second_form=find_freelancer_form,
-                                   perks=perks, services=services)
+            return parametrized_render_template("creation_task.html",
+                                                main_form=creation_form, second_form=find_freelancer_form,
+                                                perks=perks, services=services)
 
         if request.form['submit'] == 'Create task':
             query_create_task = f'''
@@ -400,9 +395,9 @@ def create_task():
                 print(e)
             return redirect(url_for('index'))
 
-    return render_template("creation_task.html", current_user=session['account_model'],
-                           main_form=creation_form, second_form=find_freelancer_form,
-                           perks=perks, services=[])
+    return parametrized_render_template("creation_task.html",
+                                        main_form=creation_form, second_form=find_freelancer_form,
+                                        perks=perks, services=[])
 
 
 def query_executor(connection, query: str, params: tuple):
