@@ -65,6 +65,12 @@ class CreationTaskForm(FlaskForm):
     executor = IntegerField('Choose freelancer', validators=[DataRequired()])
     deadline = StringField('Deadline', validators=[DataRequired()])
     description = TextAreaField('Task description')
+    
+class AddReviewForm(FlaskForm):
+    review_header = StringField('Perk description')
+    review_text = TextAreaField('Perk description')
+    review_mark = SelectField("Perk", choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+
     submit = SubmitField('Submit')
 
     def validate_deadline(self, field):

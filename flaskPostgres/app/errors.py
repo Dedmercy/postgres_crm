@@ -1,7 +1,9 @@
 from app import app
 from flask import render_template
 
+from app.routes import parametrized_render_template
+
 
 @app.errorhandler(403)
-def not_enough_right():
-    render_template('403.html'), 403
+def not_enough_right(*args, **kwargs):
+    parametrized_render_template('403.html'), 403

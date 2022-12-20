@@ -10,28 +10,42 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/registration_styles.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/reports_styles.css') }}"/>
 </head>
+
+{# подключение системы всплывающих сообщений #}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
 <body>
     <div class="wrapper">
         <header>
             <div id="header-container">
                 <div id="current-user">
-                   {{ current_user['first_name']+ ' ' +current_user['last_name']}}
+                    {% if username in session %}
+                        <p>{{ session['user_model'].first_name + " " + session['user_model'].last_name }}</p>
+                    {% endif %}
                 </div>
                 <div id="box-nav-container">
                     <div id="nav-container">
                         <div class="vertical-divider"></div>
                         <ul>
-                            {% if current_user['role_id'] == 16500 %}
+                            {% if current_user['role'] == 'freelancer' %}
                                 <li><a href="{{ url_for('index') }}">Home</a></li>
                                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
                                 <li><a href="{{ url_for('perks') }}">Profile</a></li>
-                                <li><a href="{{ url_for('review') }}">Review</a></li>
+{#                                <li><a href="{{ url_for('check_review') }}">Review</a></li>#}
                                 <li><a href="{{ url_for('task_reports') }}">Task reports</a></li>
-                            {% elif current_user['role_id'] == 16499 %}
+                            {% elif current_user['role'] == 'client' %}
                                 <li><a href="{{ url_for('index') }}">Home</a></li>
                                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
                                 <li><a href="{{ url_for('create_task') }}">New Task</a></li>
-                                <li><a href="{{ url_for('review') }}">Review</a></li>
+{#                                <li><a href="{{ url_for('check_review/' + current_user['account_id']) }}">Review</a></li>#}
                             {% endif %}
                         </ul>
                         <div class="vertical-divider"></div>

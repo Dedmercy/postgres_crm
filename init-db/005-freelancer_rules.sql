@@ -61,7 +61,7 @@ GRANT EXECUTE ON FUNCTION check_perks TO freelancer;
 
 
 -- Просмотр текущих заданий фрилансером
-CREATE VIEW current_freelanser_tasks_information AS
+CREATE VIEW current_freelancer_tasks_information AS
 	SELECT
 		task.task_id,
 		task.task_description,
@@ -76,6 +76,6 @@ CREATE VIEW current_freelanser_tasks_information AS
 	WHERE executor = to_regrole(CURRENT_USER);
 	
 
-GRANT SELECT ON current_freelanser_tasks_information to freelancer;
+GRANT SELECT ON current_freelancer_tasks_information to freelancer;
 
 
