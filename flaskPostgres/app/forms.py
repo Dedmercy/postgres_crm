@@ -1,7 +1,7 @@
 import re
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, EmailField, SelectField,\
-    TelField, TextAreaField, DateTimeField, IntegerField, BooleanField, FloatField
+from wtforms import StringField, PasswordField, SubmitField, EmailField, SelectField, \
+    TelField, TextAreaField, DateTimeLocalField, IntegerField
 from wtforms.validators import DataRequired, EqualTo, ValidationError, Length
 
 
@@ -20,10 +20,12 @@ class RegistrationForm(FlaskForm):
                        validators=[DataRequired()])
     phone = TelField('Phone', validators=[DataRequired()])
     email = EmailField('Email', validators=[DataRequired()])
-    username = StringField('Username', validators=[DataRequired(), Length(min=5, max=12,
-                                                                          message='Length should be between 5 and 12')])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=16,
-                                                                          message='Length should be between 8 and 16')])
+    username = StringField('Username', validators=[DataRequired(),
+                                                   Length(min=5, max=12,
+                                                            message='Length should be between 5 and 12')])
+    password = PasswordField('Password', validators=[DataRequired(),
+                                                     Length(min=8, max=16,
+                                                            message='Length should be between 8 and 16')])
     confirm_password = PasswordField('Confirm your password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Registration')
 
@@ -51,11 +53,29 @@ class RegistrationForm(FlaskForm):
 
 
 class AddPerkForm(FlaskForm):
-    specialization = SelectField("Specialization",  choices=[])
-    perk_id = SelectField("Perk", choices=(), coerce=int)
+    specialization = SelectField("Specialization", choices=[])
+    perk_id = SelectField("Perk", choices=[], coerce=int)
     money = IntegerField("Money")
     description = TextAreaField('Perk description')
     submit = SubmitField('Submit')
+
+
+class CreationTaskForm(FlaskForm):
+    id = IntegerField('Task id', validators=[DataRequired()])
+    executor = IntegerField('Choose freelancer', validators=[DataRequired()])
+    deadline = StringField('Deadline', validators=[DataRequired()])
+    description = TextAreaField('Task description')
+    submit = SubmitField('Submit')
+
+    def validate_deadline(self, field):
+        if re.fullmatch('\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', field.data) is None:
+            raise ValidationError('The deadline must match the pattern "YYYY-mm-dd hh:mm:ss"')
+
+
+class FindFreelancerByPerkForm(FlaskForm):
+    specialization = SelectField("Specialization", choices=[])
+    perk = SelectField("Perk", choices=[])
+    submit = SubmitField('Choose executor')
 
 # class CreationTaskForm(FlaskForm):
 #     id = IntegerField('Task id', validators=[DataRequired()])

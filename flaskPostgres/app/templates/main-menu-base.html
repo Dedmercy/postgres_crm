@@ -15,16 +15,24 @@
         <header>
             <div id="header-container">
                 <div id="current-user">
-                    {% if username in session %}
-                        <p>{{ session['user_model'].first_name + " " + session['user_model'].last_name }}</p>
-                    {% endif %}
+                   {{ current_user['first_name']+ ' ' +current_user['last_name']}}
                 </div>
                 <div id="box-nav-container">
                     <div id="nav-container">
                         <div class="vertical-divider"></div>
                         <ul>
-                            <li><a href="{{ url_for('index') }}">Home</a></li>
-                            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                            {% if current_user['role_id'] == 16500 %}
+                                <li><a href="{{ url_for('index') }}">Home</a></li>
+                                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                                <li><a href="{{ url_for('perks') }}">Profile</a></li>
+                                <li><a href="{{ url_for('review') }}">Review</a></li>
+                                <li><a href="{{ url_for('task_reports') }}">Task reports</a></li>
+                            {% elif current_user['role_id'] == 16499 %}
+                                <li><a href="{{ url_for('index') }}">Home</a></li>
+                                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                                <li><a href="{{ url_for('create_task') }}">New Task</a></li>
+                                <li><a href="{{ url_for('review') }}">Review</a></li>
+                            {% endif %}
                         </ul>
                         <div class="vertical-divider"></div>
                     </div>

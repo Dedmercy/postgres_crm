@@ -1,14 +1,10 @@
-
-
-
 -- CREATE TASK
 
 CREATE OR REPLACE PROCEDURE create_task (	
 	id INT, 
 	descr TEXT, 
 	executor INT, 
-	deadline TIMESTAMP WITHOUT TIME ZONE, 
-	perk INT)
+	deadline TIMESTAMP WITHOUT TIME ZONE)
 LANGUAGE plpgsql
 AS $$
 	BEGIN
@@ -18,8 +14,7 @@ AS $$
 		executor,
 		client,
 		task_creating_datetime,
-		task_deadline_datetime,
-		perk_id
+		task_deadline_datetime
 		)
 	VALUES (
 		id,
@@ -27,8 +22,7 @@ AS $$
 		executor,
 		to_regrole(CURRENT_USER),
 		CURRENT_TIMESTAMP,
-		deadline,
-		perk);
+		deadline);
 	 INSERT INTO task_status (
 		task_id,
 		task_status
@@ -45,8 +39,6 @@ GRANT EXECUTE ON PROCEDURE create_task TO client;
 
 GRANT SELECT, INSERT ON task TO client; 
 GRANT SELECT, INSERT ON task_status TO client;
-
-
 
 -- DELETE TASK
 
@@ -68,8 +60,6 @@ GRANT EXECUTE ON PROCEDURE delete_task TO client;
 
 GRANT SELECT, DELETE ON task TO client; 
 GRANT SELECT, DELETE ON task_status TO client;
-
-
 
 -- CONFIRM EXECUTOR
 
@@ -144,3 +134,21 @@ REVOKE ALL ON PROCEDURE mark_complete FROM PUBLIC;
 GRANT EXECUTE ON PROCEDURE mark_complete TO client;
 
 GRANT SELECT, UPDATE ON task_status TO client;
+
+-- Просмотр текущих заданий клиентом
+CREATE VIEW current_client_tasks_information AS
+	SELECT
+		task.task_id,
+		task.task_description,
+		task.client,
+		task.task_creating_datetime,
+		task.task_deadline_datetime,
+		task_status.task_status,
+		task_status.task_complete_datetime
+	FROM task
+	JOIN task_status 
+	ON task.task_id = task_status.task_id
+	WHERE task.client = to_regrole(CURRENT_USER);
+	
+GRANT SELECT ON current_client_tasks_information to client;
+

@@ -1,16 +1,83 @@
 {% extends "main-menu-base.html" %}
 
 {% block content %}
+    <script defer>
+        function chooseSpecialization1() {
+            let specializationSelect = document.getElementById("specialization");
+            let perkSelect = document.querySelector("#perk").options;
+            document.querySelector('#perk').innerHTML = '';
+            let allPerks = {{ perks|tojson }};
+            for (let i = 0; i < 40; i += 1) {
+                if (allPerks[i][2] === Number(specializationSelect.value)) {
+                    console.log( allPerks[i][0],  allPerks[i][1])
+                    perkSelect[perkSelect.length] = new Option(allPerks[i][1], allPerks[i][0], false)
+                }
+            }
+        }
+    </script>
     <div id="creation-task-page-main-box">
         <section id="choose-executor-section">
             <form action="" method="post" novalidate>
                 <div>
-
+                    <p>{{ second_form.specialization.label }}</p>
+                    <div>{{ second_form.specialization(onclick="chooseSpecialization1()") }}</div>
                 </div>
+                <div>
+                    <p>{{ second_form.perk.label }}</p>
+                    <div>{{ second_form.perk()}}</div>
+                    {% for error in second_form.perk.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>{{ second_form.submit(value="Choose executor") }}</div>
             </form>
         </section>
-        <section id="create-task-section">
-
+        <section id='services-section'>
+            {% for service in services %}
+                <div class="service-container">
+                    <p>Freelancer id: {{ service[0] }}</p>
+                    <p>{{ service[1] + ' ' + service[2]}}</p>
+                    <p>Price: {{ service[5] }}</p>
+                    <p>{{ services[6] }}</p>
+                    <p>Last time been online: {{ service[3] }}</p>
+                    <p></p>
+                </div>
+            {% endfor %}
+        </section>
+        <section id="create-task-form-section">
+            <form action="" method="post" novalidate>
+                <div>
+                    <p>{{ main_form.id.label }}</p>
+                    <div>{{ main_form.id()}}</div>
+                    {% for error in main_form.id.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    <p>{{ main_form.executor.label }}</p>
+                    <div>{{ main_form.executor()}}</div>
+                    {% for error in main_form.executor.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    <p>{{ main_form.deadline.label }}</p>
+                    <div>{{ main_form.deadline()}}</div>
+                    {% for error in main_form.deadline.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    <p>{{ main_form.description.label }}</p>
+                    <div>{{ main_form.description()}}</div>
+                    {% for error in main_form.description.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    {{ main_form.submit(value="Create task") }}
+                </div>
+            </form>
         </section>
     </div>
 {% endblock %}

@@ -1,13 +1,12 @@
 import logging as log
 from app import app, Config, errors
-from app.forms import RegistrationForm, LoginForm, AddPerkForm
-from app.models import UserModel, TaskModel, SpecializationModel
+from app.forms import RegistrationForm, LoginForm, AddPerkForm, CreationTaskForm, FindFreelancerByPerkForm
+from app.models import UserModel, TaskModel
 
 from flask import render_template, redirect, url_for, flash, request, session, abort
 from sqlalchemy.exc import OperationalError
 import psycopg2
 from psycopg2.extensions import connection as psycopg_connection
-
 
 backend_connection: psycopg_connection = psycopg2.connect(
     database=Config.database,
@@ -33,24 +32,38 @@ def index():
 
     if username not in user_connections.keys():
         return redirect(url_for('login'))
-    if session['account_model']['role_id'] == 16498:
+
+    query = ''
+
+    # Если пользователь фрилансер
+    if session['account_model']['role_id'] == 16500:
         if request.method == "POST":
             query = f'''
                 CALL complete_task({request.form.get('task-select')});
             '''
-            res = query_executor(user_connections[username], query)
+            query_executor(user_connections[username], query)
             return redirect(url_for('index'))
 
         query = f'''
             SELECT *
-            FROM current_user_tasks_information
+            FROM current_freelancer_tasks_information
         '''
-        tasks_query = query_executor(user_connections[username], query)
+
+    # Если пользователь заказчик
+    elif session['account_model']['role_id'] == 16499:
+        query = f'''
+                    SELECT *
+                    FROM current_client_tasks_information
+                '''
+
+    tasks_query = query_executor(user_connections[username], query)
+    tasks_models = []
+
+    if tasks_query:
         tasks_models = TaskModel.parse_from_query(tasks_query)
 
-        return my_render_template('index.html', title='Home', tasks=list(tasks_models))
-    else:
-        return my_render_template('index.html', title='Home', tasks=[])
+    return render_template('index.html', title='Home', tasks=tasks_models,
+                           current_user=session['account_model'])
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -123,6 +136,7 @@ def login():
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.pop('username')
+    session.pop('account_model')
     return redirect(url_for('index'))
 
 
@@ -158,7 +172,7 @@ def registration():
 
         return redirect(url_for('index'))
 
-    return render_template('registration.html', title='Registration', form=form)
+    return render_template('registration.html', title='Registration', form=form, current_user={})
 
 
 @app.route('/perks', methods=['GET', 'POST'])
@@ -171,11 +185,10 @@ def perks():
     if username not in user_connections.keys():
         return redirect(url_for('login'))
 
-    if session['account_model']['role_id'] != 16498:
+    if session['account_model']['role_id'] != 16500:
         abort(403)
 
     form: AddPerkForm = AddPerkForm()
-    print(user_connections)
 
     query_find_all_spezializations = f'''
         SELECT * FROM spezialization;
@@ -200,11 +213,11 @@ def perks():
         WHERE account_id = to_regrole('{username}');
     '''
 
-    all_speсializations = query_executor(backend_connection, query_find_all_spezializations)
+    all_specializations = query_executor(backend_connection, query_find_all_spezializations)
     all_perks = query_executor(backend_connection, query_find_all_perks)
     current_user_perks = query_executor(backend_connection, query_current_user_perks)
 
-    form.specialization.choices = all_speсializations
+    form.specialization.choices = all_specializations
 
     if request.method == 'POST':
 
@@ -215,28 +228,27 @@ def perks():
             '{form.description.data}'::TEXT
             );
         '''
-        print(query_add_perk)
         try:
             query_executor(user_connections[username], query_add_perk)
         except Exception as e:
-            print(e)
+            log.debug(e)
         return redirect(url_for('perks'))
 
-    return render_template('perks.html', form=form,  current_user=session['account_model'],
+    return render_template('perks.html', form=form, current_user=session['account_model'],
                            perks=all_perks, current_user_perks=current_user_perks)
 
 
-@app.route('/create-review', methods=['GET', 'POST'])
-def create_review():
-    pass
+@app.route('/task-reports', methods=['GET', 'POST'])
+def task_reports():
+    return render_template("task_reports.html", current_user=session['account_model'])
 
 
-@app.route('/check-review', methods=['GET', 'POST'])
-def check_review():
-    pass
+@app.route('/review', methods=['GET', 'POST'])
+def review():
+    return render_template("review.html", current_user=session['account_model'])
 
 
-@app.route('/create-tast', methods=['GET', 'POST'])
+@app.route('/create-task', methods=['GET', 'POST'])
 def create_task():
     if 'username' not in session:
         return redirect(url_for('login'))
@@ -246,10 +258,75 @@ def create_task():
     if username not in user_connections.keys():
         return redirect(url_for('login'))
 
-    if session['account_model']['role_id'] != 16497:
+    if session['account_model']['role_id'] != 16499:
         abort(403)
 
-    print(session['account-model'])
+    creation_form = CreationTaskForm()
+    find_freelancer_form = FindFreelancerByPerkForm()
+
+    # Запрос для получения всех специализаций
+    query_find_all_spezializations = f'''
+            SELECT * FROM spezialization;
+        '''
+
+    # Запрос для получения всех навыков
+    query_find_all_perks = f'''
+            SELECT * FROM perk
+        '''
+
+    perks = query_executor(backend_connection, query_find_all_perks)
+    specializations = query_executor(backend_connection, query_find_all_spezializations)
+
+    find_freelancer_form.specialization.choices = specializations
+
+    if request.method == 'POST':
+        if request.form['submit'] == 'Choose executor':
+            print(request.form)
+            query_find_suitable_freelancer = f'''
+                SELECT
+                    kek.account_id,
+                    kek.user_first_name,
+                    kek.user_last_name,
+                    kek.last_seen_datetime,
+                    service.perk_id,
+                    service.price,
+                    service.description
+                FROM service
+                JOIN (
+                    SELECT * FROM account 
+                    JOIN user_personal_data 
+                    ON user_data_id = account_id
+                ) AS kek
+                ON kek.account_id = service.account_id
+                WHERE perk_id = {find_freelancer_form.perk.data};
+            '''
+
+            services = query_executor(backend_connection, query_find_suitable_freelancer)
+            return render_template("creation_task.html", current_user=session['account_model'],
+                                   main_form=creation_form, second_form=find_freelancer_form,
+                                   perks=perks, services=services)
+
+        if request.form['submit'] == 'Create task':
+            query_create_task = f'''
+                CALL create_task(
+                    {creation_form.id.data},
+                    '{creation_form.description.data}'::TEXT,
+                    {creation_form.executor.data},
+                    '{creation_form.deadline.data}'::TIMESTAMP WITHOUT TIME ZONE
+                );
+            '''
+            try:
+                query_executor(user_connections[username], query_create_task)
+                print(f'done {query_create_task}')
+            except Exception as e:
+
+                print(e)
+            return redirect(url_for('index'))
+
+    return render_template("creation_task.html", current_user=session['account_model'],
+                           main_form=creation_form, second_form=find_freelancer_form,
+                           perks=perks, services=[])
+
 
 
 def query_executor(connection, query: str):
