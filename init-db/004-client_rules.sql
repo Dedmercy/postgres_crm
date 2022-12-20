@@ -1,25 +1,20 @@
-
-
-
 -- CREATE TASK
 
 CREATE OR REPLACE PROCEDURE create_task (	
 	id INT, 
 	descr TEXT, 
 	executor INT, 
-	deadline TIMESTAMP WITHOUT TIME ZONE, 
-	perk INT)
+	deadline TIMESTAMP WITHOUT TIME ZONE)
 LANGUAGE plpgsql
 AS $$
-	BEGIN
+BEGIN	
 	INSERT INTO task (
 		task_id,
 		task_description,
 		executor,
 		client,
 		task_creating_datetime,
-		task_deadline_datetime,
-		perk_id
+		task_deadline_datetime
 		)
 	VALUES (
 		id,
@@ -27,17 +22,16 @@ AS $$
 		executor,
 		to_regrole(CURRENT_USER),
 		CURRENT_TIMESTAMP,
-		deadline,
-		perk);
-	 INSERT INTO task_status (
+		deadline);
+		
+	INSERT INTO task_status (
 		task_id,
 		task_status
 		)
 	VALUES (
 		id,
 		'NEW');
-	COMMIT;
-	END;
+END;
 $$;
  	
 REVOKE ALL ON PROCEDURE create_task FROM PUBLIC;
@@ -45,8 +39,6 @@ GRANT EXECUTE ON PROCEDURE create_task TO client;
 
 GRANT SELECT, INSERT ON task TO client; 
 GRANT SELECT, INSERT ON task_status TO client;
-
-
 
 -- DELETE TASK
 
@@ -69,8 +61,6 @@ GRANT EXECUTE ON PROCEDURE delete_task TO client;
 GRANT SELECT, DELETE ON task TO client; 
 GRANT SELECT, DELETE ON task_status TO client;
 
-
-
 -- CONFIRM EXECUTOR
 
 CREATE PROCEDURE confirm_executor(	
@@ -79,6 +69,15 @@ CREATE PROCEDURE confirm_executor(
 LANGUAGE plpgsql
 AS $$
 	BEGIN
+	
+	SAVEPOINT started;
+	
+	--IF (SELECT COUNT(*)
+	--	FROM task
+	--	WHERE executor = potential_executor) > 5 THEN
+	--	ROLLBACK TO SAVEPOINT started;
+	--END IF;
+	
 	UPDATE task
 	SET executor = potential_executor
 	WHERE task_id = selected_task;
@@ -86,6 +85,7 @@ AS $$
 	UPDATE task_status
 	SET task_status = 'WORK'
 	WHERE task_id = selected_task;
+	
 	COMMIT;
 	END;
 $$;
@@ -144,3 +144,21 @@ REVOKE ALL ON PROCEDURE mark_complete FROM PUBLIC;
 GRANT EXECUTE ON PROCEDURE mark_complete TO client;
 
 GRANT SELECT, UPDATE ON task_status TO client;
+
+-- Просмотр текущих заданий клиентом
+CREATE VIEW current_client_tasks_information AS
+	SELECT
+		task.task_id,
+		task.task_description,
+		task.client,
+		task.task_creating_datetime,
+		task.task_deadline_datetime,
+		task_status.task_status,
+		task_status.task_complete_datetime
+	FROM task
+	JOIN task_status 
+	ON task.task_id = task_status.task_id
+	WHERE task.client = to_regrole(CURRENT_USER);
+	
+GRANT SELECT ON current_client_tasks_information to client;
+

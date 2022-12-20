@@ -60,8 +60,8 @@ REVOKE ALL ON FUNCTION check_perks FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION check_perks TO freelancer;
 
 
---Просмотр заданий пользователем
-CREATE VIEW current_user_tasks_information AS
+-- Просмотр текущих заданий фрилансером
+CREATE VIEW current_freelancer_tasks_information AS
 	SELECT
 		task.task_id,
 		task.task_description,
@@ -76,5 +76,6 @@ CREATE VIEW current_user_tasks_information AS
 	WHERE executor = to_regrole(CURRENT_USER);
 	
 
-GRANT SELECT ON current_user_tasks_information to freelancer;
+GRANT SELECT ON current_freelancer_tasks_information to freelancer;
+
 
