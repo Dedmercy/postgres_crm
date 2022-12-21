@@ -10,7 +10,7 @@ class UserModel:
     username: str
     hash_password: str
     role_id: int
-    registration_date: datetime.datetime
+    registration_date: datetime.date
     last_seen: datetime.datetime
     first_name: str
     middle_name: str
@@ -172,3 +172,29 @@ class SpecializationModel:
             )
             task_list.append(specialization_model)
         return task_list
+
+
+@dataclass
+class EditingModel:
+    num: int
+    header: str
+    text: str
+    creation_datetime: datetime.datetime
+
+    @classmethod
+    def parse_from_query(cls, request_query: list):
+        editing_list = []
+        for item in request_query:
+            num: int = item[0]
+            header: str = item[1]
+            text: str = item[2]
+            creation_datetime: datetime.datetime = item[3]
+            editing_model = EditingModel(
+                num,
+                header,
+                text,
+                creation_datetime
+            )
+            editing_list.append(editing_model)
+        return editing_list
+

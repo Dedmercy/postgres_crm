@@ -1,17 +1,15 @@
 import logging as log
 
+import psycopg2
+from flask import render_template, redirect, url_for, flash, request, session, abort
+from psycopg2.extensions import connection as psycopg_connection
+from sqlalchemy.exc import OperationalError
 from werkzeug import Response
 
 from app import app, Config
-from app.forms import RegistrationForm, LoginForm, AddPerkForm, CreationTaskForm, FindFreelancerByPerkForm
-from app.models import UserModel, TaskModel
-from app.forms import RegistrationForm, LoginForm, AddPerkForm, AddReviewForm
-from app.models import UserModel, TaskModel, SpecializationModel, ReviewModel
-
-from flask import render_template, redirect, url_for, flash, request, session, abort
-from sqlalchemy.exc import OperationalError
-import psycopg2
-from psycopg2.extensions import connection as psycopg_connection
+from app.forms import RegistrationForm, LoginForm, AddPerkForm, CreationTaskForm, FindFreelancerByPerkForm,\
+    AddReviewForm, ReportsForm, CreateEditingForm
+from app.models import UserModel, TaskModel, ReviewModel, EditingModel
 
 backend_connection: psycopg_connection = psycopg2.connect(
     database=Config.database,
@@ -118,18 +116,18 @@ def login():
             #  получает инфу для юзера
             query_account_info = f'''
                 SELECT                 
-                acc.account_id,
-                acc.login,
-                acc.hash_password ,
-                acc.role_id ,
-                acc.account_registration_date ,
-                acc.last_seen_datetime,
-                upd.user_first_name,
-                upd.user_middle_name,
-                upd.user_last_name,
-                upd.user_email ,
-                upd.user_phone ,
-                rl.role_name
+                    acc.account_id,
+                    acc.login,
+                    acc.hash_password ,
+                    acc.role_id ,
+                    acc.account_registration_date ,
+                    acc.last_seen_datetime,
+                    upd.user_first_name,
+                    upd.user_middle_name,
+                    upd.user_last_name,
+                    upd.user_email ,
+                    upd.user_phone ,
+                    rl.role_name
                 FROM account as acc
                 JOIN user_personal_data as upd
                 ON acc.account_id = upd.user_data_id
@@ -250,7 +248,6 @@ def perks():
         perk_data = (form.perk_id.data,
                      form.money.data,
                      form.description.data)
-        print(query_add_perk)
         try:
             query_executor(user_connections[username], query_add_perk, perk_data)
         except Exception as e:
@@ -261,9 +258,102 @@ def perks():
                            perks=all_perks, current_user_perks=current_user_perks)
 
 
-@app.route('/task-reports', methods=['GET', 'POST'])
-def task_reports():
-    return render_template("task_reports.html", current_user=session['account_model'])
+@app.route('/check-task-editing', methods=['GET', 'POST'])
+def check_task_editing():
+    logged_flag, username, response = check_user_logged()
+    if logged_flag:
+        return response
+
+    form = ReportsForm()
+
+    if session['account_model']['role'] != 'freelancer':
+        abort(403)
+
+    task_query = '''
+        SELECT 
+            task.task_id,
+            task.task_description,
+            task.task_creating_datetime,
+            task.task_deadline_datetime
+        FROM task
+        JOIN task_status
+        ON task_status.task_id = task.task_id
+        WHERE 
+            task_status = 'NEW'
+            AND
+            executor = %s
+    '''
+    task_query_params = (session['account_model']['account_id'], )
+    print(task_query_params)
+    tasks = query_executor(backend_connection, task_query, task_query_params)
+    print(tasks)
+    if tasks:
+        form.task.choices = [(item[0], item[1]) for item in tasks]
+
+    if form.validate_on_submit():
+        editings_query = '''
+            SELECT 
+                editing_num,
+                editing_header,
+                editing_text,
+                editing_date
+            FROM editing
+            WHERE task_id = %s
+        '''
+        editing_query_params = (form.task.data, )
+        editing = query_executor(backend_connection, editings_query, editing_query_params)
+        editing_models = EditingModel.parse_from_query(editing)
+        return parametrized_render_template("show-task-editing.html", tasks=tasks, form=form, editing_models=editing_models)
+
+    return parametrized_render_template("show-task-editing.html", tasks=tasks, form=form, editing_models=[])
+
+
+@app.route('/create-task-editing', methods=['GET', 'POST'])
+def create_task_editing():
+    logged_flag, username, response = check_user_logged()
+    if logged_flag:
+        return response
+
+    form = CreateEditingForm()
+
+    if session['account_model']['role'] != 'client':
+        abort(403)
+
+    task_query = '''
+        SELECT 
+            task.task_id,
+            task.task_description
+        FROM task
+        JOIN task_status
+        ON task_status.task_id = task.task_id
+        WHERE 
+            task_status = 'NEW'
+            AND
+            client = %s
+    '''
+    task_query_params = (session['account_model']['account_id'], )
+    tasks = query_executor(backend_connection, task_query, task_query_params)
+
+    form.task.choices = tasks
+
+    if request.method == 'POST':
+        create_editing_query = '''
+            CALL add_editing(%s::INTEGER, %s::INTEGER, %s::VARCHAR, %s::TEXT);
+        '''
+
+        create_editing_query_params = (
+            int(form.task.data),
+            form.num.data,
+            form.header.data,
+            form.text.data
+        )
+        try:
+            query_executor(user_connections[username], create_editing_query, create_editing_query_params)
+        except Exception as e:
+            print(e)
+        return redirect(url_for('index'))
+
+    return parametrized_render_template('create-task-editing.html', form=form)
 
 
 @app.route('/create-review/<user_login>', methods=['GET', 'POST'])

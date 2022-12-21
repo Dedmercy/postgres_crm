@@ -2,9 +2,36 @@
     padding: 20px;
 }
 
+body, html{
+    margin: 0;
+}
+
+h1{
+    text-align: center;
+}
+
 #registration-form-container{
     padding: 20px;
     border: 1px solid #D8DEE4;
     background-color: #F6F8FA;
 
+}
+
+input{
+    width: 30%;
+    height: 30px;
+}
+
+select{
+    height: 36px;
+    width: 30.35%;
+    padding: 2px;
+}
+
+#submit{
+    height: 2em;
+    width: 30%;
+    background-color: #60c465;
+    border: 1px solid #D8DEE4;
+    margin: 10px 0 0 0;
 }

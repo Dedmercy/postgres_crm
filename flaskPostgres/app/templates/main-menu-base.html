@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/main_menu_footer.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/index.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/creation_task.css') }}"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/registration_styles.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/reports_styles.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/perks_styles.css') }}"/>
 </head>
 
 {# подключение системы всплывающих сообщений #}
@@ -41,11 +41,13 @@
                                 <li><a href="{{ url_for('perks') }}">Profile</a></li>
                                 <li><a href="{{ 'check-review/' + current_user['username'] }}">My Reviews</a></li>
                                 <li><a href="{{ url_for('task_reports') }}">Task reports</a></li>
+                                <li><a href="{{ url_for('check_task_editing') }}">Show Editing</a></li>
                             {% elif current_user['role'] == 'client' %}
                                 <li><a href="{{ url_for('index') }}">Home</a></li>
                                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
                                 <li><a href="{{ url_for('create_task') }}">New Task</a></li>
                                 <li><a href="{{ 'check-review/' + current_user['username'] }}">My Reviews</a></li>
+                                <li><a href="{{ url_for('create_task_editing') }}">Create Editing</a></li>
                             {% endif %}
                         </ul>
                         <div class="vertical-divider"></div>

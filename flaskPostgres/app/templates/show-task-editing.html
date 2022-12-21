@@ -1,0 +1,31 @@
+{% extends "main-menu-base.html"%}
+
+{% block content %}
+    <div id="task-reports-box">
+        <section id="task-editing-select-task-box">
+            <form method="post" action="" novalidate>
+                <div>
+                    <p>{{ form.task.label }}</p>
+                    <div>{{ form.task() }}</div>
+                </div>
+                <div>
+                    {{ form.submit() }}
+                </div>
+            </form>
+        </section>
+        <section id="task-editing-tasks-info-box">
+            <h1>Editing</h1>
+            {% if editing_models|length == 0 %}
+                <p>No editing for this task</p>
+            {% endif %}
+            {% for editing_model in editing_models %}
+                <div class="editing-container">
+                    <p>#{{ editing_model['num'] }}</p>
+                    <p>#{{ editing_model['header'] }}</p>
+                    <p>#{{ editing_model['task'] }}</p>
+                    <p>#{{ editing_model['creation_datetime'] }}</p>
+                </div>
+            {% endfor %}
+        </section>
+    </div>
+{% endblock %}

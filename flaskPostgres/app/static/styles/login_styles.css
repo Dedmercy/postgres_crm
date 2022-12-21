@@ -59,6 +59,7 @@ p{
     background-color: #F6F8FA;
     border: 1px solid #D8DEE4;
     border-radius: 5px;
+    width: 200px;
 }
 
 input{
@@ -75,6 +76,34 @@ input{
     border: 1px solid #D8DEE4;
 }
 
+#submit:hover, input[type=checkbox]:hover{
+    cursor: pointer;
+}
+
 #submit:hover{
     background-color: #03af03;
+}
+
+#login-callout{
+    margin: 20px;
+    background-color: #F6F8FA;
+    border: 1px solid #D8DEE4;
+    border-radius: 5px;
+    padding: 20px 40px;
+    width: 200px;
+    text-align: center;
+}
+
+#login-callout a{
+    color: dodgerblue;
+    text-decoration: none;
+}
+
+#login-callout a:hover{
+    color: dodgerblue;
+    text-decoration: underline;
+}
+
+#login-callout a:visited{
+    color: dodgerblue;
 }
