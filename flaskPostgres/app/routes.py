@@ -134,7 +134,8 @@ def login():
                     upd.user_last_name,
                     upd.user_email ,
                     upd.user_phone ,
-                    rl.role_name
+                    rl.role_name,
+                    acc.profile_image
                 FROM account as acc
                 JOIN user_personal_data as upd
                 ON acc.account_id = upd.user_data_id
@@ -162,8 +163,9 @@ def login():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    session.pop('username')
-    session.pop('account_model')
+    # session.pop('username')
+    # session.pop('account_model')
+    session.clear()
     return redirect(url_for('index'))
 
 
@@ -203,8 +205,8 @@ def registration():
     return render_template('registration.html', title='Registration', form=form, current_user={})
 
 
-@app.route('/perks', methods=['GET', 'POST'])
-def perks():
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
     logged_flag, username, response = check_user_logged()
     if logged_flag:
         return response
@@ -259,9 +261,9 @@ def perks():
             query_executor(user_connections[username], query_add_perk, perk_data)
         except Exception as e:
             log.debug(e)
-        return redirect(url_for('perks'))
+        return redirect(url_for('profile'))
 
-    return render_template('perks.html', form=form, current_user=session['account_model'],
+    return render_template('profile.html', form=form, current_user=session['account_model'],
                            perks=all_perks, current_user_perks=current_user_perks)
 
 
@@ -414,7 +416,7 @@ def check_review(user_login):
     reviews_query = query_executor(user_connections[username], query, (user_login,))
     reviews_models = ReviewModel.parse_from_query(reviews_query)
 
-    return parametrized_render_template('reviews.html', title='Home', reviews=list(reviews_models),
+    return parametrized_render_template('show_reviews.html', title='Home', reviews=list(reviews_models),
                                         watched_user=user_login)
 
 
@@ -471,7 +473,7 @@ def create_task():
             services = query_executor(backend_connection, query_find_suitable_freelancer,
                                       (find_freelancer_form.perk.data,))
             service_models = ServiceModel.parse_from_query(services)
-            return parametrized_render_template("creation_task.html",
+            return parametrized_render_template("create_task.html",
                                                 main_form=creation_form, second_form=find_freelancer_form,
                                                 perks=perks, services=service_models)
 
@@ -495,7 +497,7 @@ def create_task():
                 print(e)
             return redirect(url_for('index'))
 
-    return parametrized_render_template("creation_task.html",
+    return parametrized_render_template("create_task.html",
                                         main_form=creation_form, second_form=find_freelancer_form,
                                         perks=perks, services=[])
 

@@ -18,6 +18,7 @@ class UserModel:
     email: str
     number: int
     role: str
+    profile_image: str
 
     @classmethod
     def parse_from_query(cls, request_query: list) -> list:
@@ -36,6 +37,7 @@ class UserModel:
             email: str = v[9]
             number: int = v[10]
             role: str = v[11]
+            profile_image: str = v[12]
 
             user_model = UserModel(account_id,
                                    username,
@@ -48,7 +50,8 @@ class UserModel:
                                    last_name,
                                    email,
                                    number,
-                                   role)
+                                   role,
+                                   profile_image)
 
             user_list.append(user_model)
         return user_list
@@ -61,7 +64,6 @@ class UserModel:
         return dict_to_json
 
     @classmethod
-    # def from_json(cls, json_str):
     def from_simple_formats(cls, params_dict):
         # params_dict = json.loads(json_str)
 
@@ -124,6 +126,12 @@ class ReviewModel:
     header: str
     text: str
     mark: int
+    author: int
+    login: str
+    profile_image: str
+    first_name: str
+    last_name: str
+    middle_name: str
 
     @classmethod
     def parse_from_query(cls, request_query: list) -> list:
@@ -134,12 +142,25 @@ class ReviewModel:
             header: str = v[2]
             text: str = v[3]
             mark: int = v[4]
+            author: int = v[5]
+            login: str = v[6]
+            profile_image: str = v[7]
+            first_name: str = v[8]
+            last_name: str = v[9]
+            middle_name: str = v[10]
 
             review_model = ReviewModel(id_,
                                        num,
                                        header,
                                        text,
-                                       mark)
+                                       mark,
+                                       author,
+                                       login,
+                                       profile_image,
+                                       first_name,
+                                       last_name,
+                                       middle_name
+                                       )
 
             review_list.append(review_model)
         return review_list

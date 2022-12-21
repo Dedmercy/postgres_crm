@@ -59,6 +59,9 @@
         <section id="freelancer-info-section">
             <div id="personal-data-container">
                 <h1>Personal data</h1>
+                <div>
+                    <img alt="Profile photo" src="{{ url_for('static', filename='img/' + current_user['profile_image']) }}"/>
+                </div>
                 <div id="freelancer-data">
                     <p>Name: {{ current_user['first_name'] }}</p>
                     <p>Middle name: {{current_user['middle_name']}}</p>

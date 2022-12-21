@@ -10,6 +10,9 @@
             <div id="reviews">
                 {% for review in reviews %}
                     <div class="review-container">
+
+                    <img height="64" width="64" alt="Profile photo" src="{{ url_for('static', filename='img/' + review.profile_image) }}"/>
+                        <a href="{{ review.login }}">{{ review.first_name + ' ' + review.last_name}}</a>
                         <div class="review-header">
                             <h2>Header: {{ review.header }}</h2>
                         </div>
