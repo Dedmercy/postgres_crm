@@ -290,8 +290,8 @@ def check_task_editing():
     if tasks:
         form.task.choices = [(item[0], item[1]) for item in tasks]
 
-    if form.validate_on_submit():
-        editings_query = '''
+    if request.method == 'POST':
+        editing_query = '''
             SELECT 
                 editing_num,
                 editing_header,
@@ -301,9 +301,11 @@ def check_task_editing():
             WHERE task_id = %s
         '''
         editing_query_params = (form.task.data, )
-        editing = query_executor(backend_connection, editings_query, editing_query_params)
+        editing = query_executor(backend_connection, editing_query, editing_query_params)
         editing_models = EditingModel.parse_from_query(editing)
-        return parametrized_render_template("show-task-editing.html", tasks=tasks, form=form, editing_models=editing_models)
+        print(editing_models)
+        return parametrized_render_template("show-task-editing.html", tasks=tasks, form=form,
+                                            editing_models=editing_models)
 
     return parametrized_render_template("show-task-editing.html", tasks=tasks, form=form, editing_models=[])
 
