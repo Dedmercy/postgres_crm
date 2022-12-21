@@ -7,9 +7,16 @@ from sqlalchemy.exc import OperationalError
 from werkzeug import Response
 
 from app import app, Config
-from app.forms import RegistrationForm, LoginForm, AddPerkForm, CreationTaskForm, FindFreelancerByPerkForm,\
+from app.forms import RegistrationForm, LoginForm, AddPerkForm, CreationTaskForm, FindFreelancerByPerkForm, \
     AddReviewForm, ReportsForm, CreateEditingForm
-from app.models import UserModel, TaskModel, ReviewModel, EditingModel
+from app.models import UserModel, TaskModel, ReviewModel, EditingModel, ServiceModel
+from app.forms import RegistrationForm, LoginForm, AddPerkForm, AddReviewForm
+from app.models import UserModel, TaskModel, SpecializationModel, ReviewModel
+
+from flask import render_template, redirect, url_for, flash, request, session, abort
+from sqlalchemy.exc import OperationalError
+import psycopg2
+from psycopg2.extensions import connection as psycopg_connection
 
 backend_connection: psycopg_connection = psycopg2.connect(
     database=Config.database,
@@ -283,7 +290,7 @@ def check_task_editing():
             AND
             executor = %s
     '''
-    task_query_params = (session['account_model']['account_id'], )
+    task_query_params = (session['account_model']['account_id'],)
     print(task_query_params)
     tasks = query_executor(backend_connection, task_query, task_query_params)
     print(tasks)
@@ -300,10 +307,11 @@ def check_task_editing():
             FROM editing
             WHERE task_id = %s
         '''
-        editing_query_params = (form.task.data, )
+        editing_query_params = (form.task.data,)
         editing = query_executor(backend_connection, editings_query, editing_query_params)
         editing_models = EditingModel.parse_from_query(editing)
-        return parametrized_render_template("show-task-editing.html", tasks=tasks, form=form, editing_models=editing_models)
+        return parametrized_render_template("show-task-editing.html", tasks=tasks, form=form,
+                                            editing_models=editing_models)
 
     return parametrized_render_template("show-task-editing.html", tasks=tasks, form=form, editing_models=[])
 
@@ -331,7 +339,7 @@ def create_task_editing():
             AND
             client = %s
     '''
-    task_query_params = (session['account_model']['account_id'], )
+    task_query_params = (session['account_model']['account_id'],)
     tasks = query_executor(backend_connection, task_query, task_query_params)
 
     form.task.choices = tasks
@@ -442,28 +450,30 @@ def create_task():
             print(request.form)
             query_find_suitable_freelancer = f'''
                 SELECT
-                    kek.account_id,
-                    kek.user_first_name,
-                    kek.user_last_name,
-                    kek.last_seen_datetime,
+                    accs.account_id,
+                    accs.user_first_name,
+                    accs.user_last_name,
+                    accs.last_seen_datetime,
                     service.perk_id,
                     service.price,
-                    service.description
+                    service.description,
+                    accs.login
                 FROM service
                 JOIN (
                     SELECT * FROM account 
                     JOIN user_personal_data 
                     ON user_data_id = account_id
-                ) AS kek
-                ON kek.account_id = service.account_id
+                ) AS accs
+                ON accs.account_id = service.account_id
                 WHERE perk_id = %s;
             '''
 
             services = query_executor(backend_connection, query_find_suitable_freelancer,
                                       (find_freelancer_form.perk.data,))
+            service_models = ServiceModel.parse_from_query(services)
             return parametrized_render_template("creation_task.html",
                                                 main_form=creation_form, second_form=find_freelancer_form,
-                                                perks=perks, services=services)
+                                                perks=perks, services=service_models)
 
         if request.form['submit'] == 'Create task':
             query_create_task = f'''

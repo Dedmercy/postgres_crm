@@ -35,11 +35,11 @@
         <section id='services-section'>
             {% for service in services %}
                 <div class="service-container">
-                    <p>Freelancer id: {{ service[0] }}</p>
-                    <p>{{ service[1] + ' ' + service[2]}}</p>
-                    <p>Price: {{ service[5] }}</p>
-                    <p>{{ services[6] }}</p>
-                    <p>Last time been online: {{ service[3] }}</p>
+                    <p>Freelancer id: {{ service.id }}</p>
+                    <a href="{{ 'check-review/' + service.login }}">{{ service.first_name + ' ' + service.last_name}}</a>
+                    <p>Price: {{ service.price }}</p>
+                    <p>{{ services.description }}</p>
+                    <p>Last time been online: {{ service.last_seen_datetime.strftime('%Y-%m-%d %H:%M') }}</p>
                     <p></p>
                 </div>
             {% endfor %}
