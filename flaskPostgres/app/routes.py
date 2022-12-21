@@ -4,7 +4,7 @@ from werkzeug import Response
 
 from app import app, Config
 from app.forms import RegistrationForm, LoginForm, AddPerkForm, CreationTaskForm, FindFreelancerByPerkForm
-from app.models import UserModel, TaskModel
+from app.models import UserModel, TaskModel, ServiceModel
 from app.forms import RegistrationForm, LoginForm, AddPerkForm, AddReviewForm
 from app.models import UserModel, TaskModel, SpecializationModel, ReviewModel
 
@@ -352,28 +352,30 @@ def create_task():
             print(request.form)
             query_find_suitable_freelancer = f'''
                 SELECT
-                    kek.account_id,
-                    kek.user_first_name,
-                    kek.user_last_name,
-                    kek.last_seen_datetime,
+                    accs.account_id,
+                    accs.user_first_name,
+                    accs.user_last_name,
+                    accs.last_seen_datetime,
                     service.perk_id,
                     service.price,
-                    service.description
+                    service.description,
+                    accs.login
                 FROM service
                 JOIN (
                     SELECT * FROM account 
                     JOIN user_personal_data 
                     ON user_data_id = account_id
-                ) AS kek
-                ON kek.account_id = service.account_id
+                ) AS accs
+                ON accs.account_id = service.account_id
                 WHERE perk_id = %s;
             '''
 
             services = query_executor(backend_connection, query_find_suitable_freelancer,
                                       (find_freelancer_form.perk.data,))
+            service_models = ServiceModel.parse_from_query(services)
             return parametrized_render_template("creation_task.html",
                                                 main_form=creation_form, second_form=find_freelancer_form,
-                                                perks=perks, services=services)
+                                                perks=perks, services=service_models)
 
         if request.form['submit'] == 'Create task':
             query_create_task = f'''

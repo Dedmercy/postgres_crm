@@ -172,3 +172,42 @@ class SpecializationModel:
             )
             task_list.append(specialization_model)
         return task_list
+
+
+@dataclass
+class ServiceModel:
+    id: int
+    first_name: str
+    last_name: str
+    last_seen_datetime: int
+    perk_id: int
+    price: int
+    description: str
+    login: str
+
+    @classmethod
+    def parse_from_query(cls, request_query: list) -> list:
+        service_list = []
+        for item in request_query:
+            account_id: int = item[0]
+            user_first_name: str = item[1]
+            user_last_name: str = item[2]
+            last_seen_datetime: int = item[3]
+            perk_id: int = item[4]
+            price: int = item[5]
+            description: str = item[6]
+            login: str = item[7]
+
+            service_model = ServiceModel(
+                account_id,
+                user_first_name,
+                user_last_name,
+                last_seen_datetime,
+                perk_id,
+                price,
+                description,
+                login
+            )
+
+            service_list.append(service_model)
+        return service_list

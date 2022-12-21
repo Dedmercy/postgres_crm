@@ -66,6 +66,8 @@ class CreationTaskForm(FlaskForm):
     deadline = StringField('Deadline', validators=[DataRequired()])
     description = TextAreaField('Task description')
 
+    submit = SubmitField('Submit')
+
 
 class AddReviewForm(FlaskForm):
     review_header = StringField('Заголовок отзыва')
