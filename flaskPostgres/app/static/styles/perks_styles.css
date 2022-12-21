@@ -7,7 +7,6 @@
 #perk-page-main-box section{
     margin: 20px;
     width: 50%;
-
 }
 
 #personal-data-container, .current-user-perk, #add-perk-form-section{
@@ -28,7 +27,7 @@
     margin: 0 10px;
 }
 
-#add-perk-form-section select, input, textarea{
+#add-perk-form-section  select, input, textarea{
     width: 100%;
 }
 
@@ -49,6 +48,6 @@
     margin-top: 10px;
 }
 
-h1{
+#perk-page-main-box h1{
     text-align: center;
 }

@@ -66,7 +66,12 @@ class CreationTaskForm(FlaskForm):
     deadline = StringField('Deadline', validators=[DataRequired()])
     description = TextAreaField('Task description')
     submit = SubmitField('Create task')
-    
+
+    def validate_deadline(self, field):
+        if re.fullmatch('\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', field.data) is None:
+            raise ValidationError('The deadline must match the pattern "YYYY-mm-dd hh:mm:ss"')
+
+
 class AddReviewForm(FlaskForm):
     review_header = StringField('Perk description')
     review_text = TextAreaField('Perk description')
@@ -74,29 +79,22 @@ class AddReviewForm(FlaskForm):
 
     submit = SubmitField('Add Review')
 
-    def validate_deadline(self, field):
-        if re.fullmatch('\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', field.data) is None:
-            raise ValidationError('The deadline must match the pattern "YYYY-mm-dd hh:mm:ss"')
-
 
 class FindFreelancerByPerkForm(FlaskForm):
     specialization = SelectField("Specialization", choices=[])
     perk = SelectField("Perk", choices=[])
     submit = SubmitField('Choose executor')
 
-# class CreationTaskForm(FlaskForm):
-#     id = IntegerField('Task id', validators=[DataRequired()])
-#     contact_person = SelectField('Contact person', choices=[])
-#     employee = SelectField('Executor', choices=[])
-#     good = SelectField('Good', choices=[])
-#     deadline = DateTimeField('Deadline')
-#     priority = StringField('Priority', validators=[DataRequired()])
-#     description = TextAreaField('Something about task')
-#     submit = SubmitField("Create task")
-#
-#
-# class TimeReportForm(FlaskForm):
-#     id = SelectField("Employee", choices=[])
-#     time_start = DateTimeField('Time start format:', validators=[DataRequired()])
-#     time_end = DateTimeField('Time end format:', validators=[DataRequired()])
-#     submit = SubmitField("Check report")
+
+class ReportsForm(FlaskForm):
+    task = SelectField("Task", choices=[], validators=[DataRequired()])
+    submit = SubmitField("Show info")
+
+
+class CreateEditingForm(FlaskForm):
+    task = SelectField("Task", choices=[], validators=[DataRequired()])
+    num = IntegerField('Editing number', validators=[DataRequired()])
+    header = StringField('Header', validators=[DataRequired(),
+                                               Length(max=20, message="Header length must be less than 20")])
+    text = TextAreaField('Editing description')
+    submit = SubmitField("Show info")

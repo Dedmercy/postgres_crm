@@ -1,0 +1,46 @@
+{% extends "main-menu-base.html" %}
+{% block content %}
+    <div id="create-task-editing-box">
+        <section>
+            <form method="post" action="" novalidate>
+                <div>
+                    <p>{{ form.task.label }}</p>
+                    <div>{{ form.task() }}</div>
+                    {% for error in form.task.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    <p>{{ form.num.label }}</p>
+                    <div>{{ form.num() }}</div>
+                    {% for error in form.num.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    <p>{{ form.header.label }}</p>
+                    <div>{{ form.header() }}</div>
+                    {% for error in form.header.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    <p>{{ form.text.label }}</p>
+                    <div>{{ form.text() }}</div>
+                    {% for error in form.text.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    {{ form.submit() }}
+                </div>
+            </form>
+            <form>
+
+            </form>
+        </section>
+        <section>
+
+        </section>
+    </div>
+{% endblock %}
