@@ -13,7 +13,8 @@ CREATE PROCEDURE create_user(
 	phone BIGINT,
 	user_nickname CHARACTER VARYING(12),
 	user_password CHARACTER VARYING(20),
-	role_name CHARACTER VARYING(20)
+	role_name CHARACTER VARYING(20),
+	image_path TEXT DEFAULT 'no_image.jpg'
 	)
 	AS $$
 	BEGIN
@@ -28,14 +29,16 @@ CREATE PROCEDURE create_user(
 		hash_password,
 		role_id,
 		account_registration_date,
-		last_seen_datetime)
+		last_seen_datetime,
+		profile_image)
 	VALUES(
 		to_regrole(user_nickname),
 		user_nickname,
 		crypt(user_password, gen_salt('md5')),
 		to_regrole(role_name),
 		CURRENT_DATE,
-		CURRENT_TIMESTAMP);
+		CURRENT_TIMESTAMP,
+		image_path);
 	--	Заполняем таблицу с Персональными данными
 	INSERT INTO user_personal_data(
 		user_data_id,

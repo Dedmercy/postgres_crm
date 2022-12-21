@@ -92,17 +92,29 @@ CALL create_user(
 	'ParolKrutoi',
 	'client');
 	
+SET ROLE kebab;
+
 -- Проверка отзывов
 CALL create_review(
 	to_regrole('reznik')::INT,
-	1001,
 	'Отличная работа'::CHARACTER VARYING(25),
 	'Выполнил работу в срок, отличное исполнение.'::TEXT,
 	10::SMALLINT);
 	
+CALL create_review(
+	to_regrole('reznik')::INT,
+	'Всё супер!'::CHARACTER VARYING(25),
+	'Без пререканий!!.'::TEXT,
+	9::SMALLINT);
+	
+CALL create_review(
+	to_regrole('reznik')::INT,
+	'Бургер кинг говно!'::CHARACTER VARYING(25),
+	'Бургер кинг говно! Бургер кинг говно! Бургер кинг говно!'::TEXT,
+	1::SMALLINT);
+	
 SELECT * FROM watch_reviews(to_regrole('reznik')::INT);
  
-SET ROLE kebab;
  
  -- Создание задания
 CALL create_task(
@@ -117,5 +129,16 @@ CALL create_task(
 	to_regrole('reznik')::INT, 
 	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE);
 	
+RESET ROLE;
+
+
+SET ROLE reznik;
+
+CALL add_perk(
+            101,
+            228::MONEY,
+            'Долго. Дорого. Офигенно.'::TEXT
+            );
+			
 RESET ROLE;
 	

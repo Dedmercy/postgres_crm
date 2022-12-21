@@ -33,6 +33,8 @@ CREATE TABLE Account
 	account_registration_date date NOT NULL,
 	-- Дата и время последнего входа в систему.
 	last_seen_datetime timestamp,
+	-- Картинка профиля
+	profile_image text DEFAULT 'no_image' NOT NULL,
 	PRIMARY KEY (account_id)
 ) WITHOUT OIDS;
 
@@ -79,6 +81,8 @@ CREATE TABLE Review
 	review_text text,
 	-- Оценка. (От 1 до 10).
 	review_mark smallint NOT NULL,
+	-- Айди автора отзыва
+	author_id int NOT NULL,
 	PRIMARY KEY (account_id, review_num)
 ) WITHOUT OIDS;
 
@@ -181,6 +185,14 @@ ALTER TABLE Review
 ;
 
 
+ALTER TABLE Review
+	ADD FOREIGN KEY (author_id)
+	REFERENCES Account (account_id)
+	ON UPDATE RESTRICT
+	ON DELETE RESTRICT
+;
+
+
 ALTER TABLE Service
 	ADD FOREIGN KEY (account_id)
 	REFERENCES Account (account_id)
@@ -264,6 +276,7 @@ COMMENT ON COLUMN Account.role_id IS 'Идентификатор роли';
 COMMENT ON COLUMN Account.account_registration_date IS 'Дата регистрации
 ';
 COMMENT ON COLUMN Account.last_seen_datetime IS 'Дата и время последнего входа в систему.';
+COMMENT ON COLUMN Account.profile_image IS 'Картинка профиля';
 COMMENT ON COLUMN Editing.task_id IS 'Идентификатор задания';
 COMMENT ON COLUMN Editing.editing_num IS 'Идентификатор правки';
 COMMENT ON COLUMN Editing.editing_header IS 'Заголовок правки';
@@ -279,6 +292,7 @@ COMMENT ON COLUMN Review.review_num IS 'Идентификационный но�
 COMMENT ON COLUMN Review.review_header IS 'Заголовок отзыва';
 COMMENT ON COLUMN Review.review_text IS 'Содержание отзыва';
 COMMENT ON COLUMN Review.review_mark IS 'Оценка. (От 1 до 10).';
+COMMENT ON COLUMN Review.author_id IS 'Айди автора отзыва';
 COMMENT ON TABLE Role IS 'Таблица, хранящая данные о групповых ролях.';
 COMMENT ON COLUMN Role.role_id IS 'Идентификатор роли';
 COMMENT ON COLUMN Role.role_name IS 'Наименование роли';
