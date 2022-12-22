@@ -14,7 +14,7 @@ from app.forms import RegistrationForm, LoginForm, AddPerkForm, CreationTaskForm
 from app.models import UserModel, TaskModel, ReviewModel, EditingModel, ServiceModel
 from app.forms import RegistrationForm, LoginForm, AddPerkForm, AddReviewForm
 from app.models import UserModel, TaskModel, SpecializationModel, ReviewModel
-from app.second_auth import send_code_email
+from app.second_auth import send_code_email, send_code_call
 
 from flask import render_template, redirect, url_for, flash, request, session, abort
 from sqlalchemy.exc import OperationalError
@@ -163,9 +163,14 @@ def login():
             session['username'] = username
         else:
             session['username_temp'] = username
-            code = rnd.randint(100000, 999999)
-            user_codes[username] = code
-            send_code_email(account_model.email, account_model.first_name, code)
+            if form.auth_form.data == 'mail':
+                code = rnd.randint(1000, 9999)
+                code = send_code_email(account_model.email, account_model.first_name, code)
+                user_codes[username] = code
+            elif form.auth_form.data == 'phone call':
+                code = send_code_call(account_model.number)
+                user_codes[username] = code
+
             return redirect(url_for('second_auth'))
 
         return redirect(url_for('index'))
