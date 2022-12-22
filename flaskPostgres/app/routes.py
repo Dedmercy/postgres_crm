@@ -44,14 +44,6 @@ def index():
 
     # Если пользователь фрилансер
     if session['account_model']['role'] == 'freelancer':
-        if request.method == "POST":
-            task_id = request.form.get('task-select')
-            query = f'''
-                CALL complete_task(%s);
-            '''
-            res = query_executor(user_connections[username], query, (task_id,))
-            return redirect(url_for('index'))
-
         query = f'''
             SELECT *
             FROM current_freelancer_tasks_information
@@ -59,6 +51,13 @@ def index():
 
     # Если пользователь заказчик
     elif session['account_model']['role'] == 'client':
+        if request.method == "POST":
+            task_id = request.form.get('task-select')
+            query = f'''
+                CALL mark_complete(%s);
+            '''
+            res = query_executor(user_connections[username], query, (task_id,))
+            return redirect(url_for('index'))
         query = f'''
                     SELECT *
                     FROM current_client_tasks_information

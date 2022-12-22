@@ -85,7 +85,7 @@ class TaskModel:
     deadline_date: datetime.datetime
     status: str
     complete_date: datetime.datetime | None
-    client_login: str
+    login: str
 
     @classmethod
     def parse_from_query(cls, request_query: list) -> list:

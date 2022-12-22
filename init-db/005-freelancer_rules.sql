@@ -69,7 +69,8 @@ CREATE VIEW current_freelancer_tasks_information AS
 		task.task_creating_datetime,
 		task.task_deadline_datetime,
 		task_status.task_status,
-		task_status.task_complete_datetime
+		task_status.task_complete_datetime,
+		pg_get_userbyid(task.client::REGROLE)
 	FROM task
 	JOIN task_status 
 	ON task.task_id = task_status.task_id

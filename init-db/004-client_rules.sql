@@ -1,13 +1,18 @@
 -- CREATE TASK
 
+CREATE SEQUENCE task_serial START 1;
+
 CREATE OR REPLACE PROCEDURE create_task (	
-	id INT, 
 	descr TEXT, 
 	executor INT, 
 	deadline TIMESTAMP WITHOUT TIME ZONE)
 LANGUAGE plpgsql
 AS $$
+DECLARE 
+	id INT;
 BEGIN	
+	SELECT nextval('task_serial') INTO id;
+	
 	INSERT INTO task (
 		task_id,
 		task_description,
@@ -36,6 +41,8 @@ $$;
  	
 REVOKE ALL ON PROCEDURE create_task FROM PUBLIC;
 GRANT EXECUTE ON PROCEDURE create_task TO client;
+
+GRANT USAGE, SELECT ON SEQUENCE task_serial TO client;
 
 GRANT SELECT, INSERT ON task TO client; 
 GRANT SELECT, INSERT ON task_status TO client;
@@ -132,11 +139,12 @@ GRANT SELECT, INSERT ON editing TO client;
 
 -- MARK TASK AS COMPLETED
 
-CREATE PROCEDURE mark_complete (	task INT)
+CREATE PROCEDURE mark_complete (task INT)
 LANGUAGE 'sql'
 AS $$
 	UPDATE task_status
-	SET task_status = 'DONE'
+	SET task_status = 'DONE',
+	task_complete_datetime = CURRENT_TIMESTAMP	
 	WHERE task_id = task;
 $$;
  	
@@ -150,11 +158,12 @@ CREATE VIEW current_client_tasks_information AS
 	SELECT
 		task.task_id,
 		task.task_description,
-		task.client,
+		task.executor,
 		task.task_creating_datetime,
 		task.task_deadline_datetime,
 		task_status.task_status,
-		task_status.task_complete_datetime
+		task_status.task_complete_datetime,
+		pg_get_userbyid(task.executor::REGROLE)
 	FROM task
 	JOIN task_status 
 	ON task.task_id = task_status.task_id

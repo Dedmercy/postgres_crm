@@ -19,36 +19,42 @@
                     </div>
                     {% if task.status == 'DONE' %}
                     <div>
-                        <p>Completed date:{{ task.complete_date}}</p>
+                        <p>Completed date:{{ task.complete_date.strftime('%Y-%m-%d %H:%M')}}</p>
                     </div>
                     {% endif %}
                     <div class="task-data">
                         <p>About task: <br>{{ task.description }}</p>
                         <div>
-                            <p>Author: {{ task.client }}</p>
-                            <p>Creation date: {{ task.creation_date }}</p>
-                            <p>Deadline date: {{ task.deadline_date }}</p>
+                            {% if current_user.role == 'freelancer' %}
+                                <p>Author: </p><a href="{{"check-review/" + task.login }}">{{ task.login }}</a>
+                            {% else %}
+                                <p>Executor: </p><a href="{{"check-review/" + task.login }}">{{ task.login }}</a>
+                            {% endif %}
+                            <p>Creation date: {{ task.creation_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p>Deadline date: {{ task.deadline_date.strftime('%Y-%m-%d %H:%M') }}</p>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
-        <div id="complete-task-menu-container">
-            <form action="" method="post" >
-                <div id="complete-menu-task-header">
-                </div>
-                <div>
-                    <select id="task-select" name="task-select">
-                        {% for task in tasks %}
-                            {% if task.task_status_name != 'C' %}
-                                <option>{{ task.id }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <input name="submit" type="submit" id="submit"/>
-                </div>
-            </form>
-        </div>
+        {% if current_user.role == 'client' %}
+            <div id="complete-task-menu-container">
+                <form action="" method="post" >
+                    <div id="complete-menu-task-header">
+                    </div>
+                    <div>
+                        <select id="task-select" name="task-select">
+                            {% for task in tasks %}
+                                {% if task.task_status_name != 'C' %}
+                                    <option>{{ task.id }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <input name="submit" type="submit" id="submit"/>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
     {% endif %}
 </section>
 {% endblock %}

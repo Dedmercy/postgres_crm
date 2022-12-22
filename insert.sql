@@ -118,13 +118,11 @@ SELECT * FROM watch_reviews(to_regrole('reznik')::INT);
  
  -- Создание задания
 CALL create_task(
-	10001, 
 	'сделать видео на утренник', 
 	to_regrole('reznik')::INT, 
 	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE);
 	
 	CALL create_task(
-	10002, 
 	'сделать видеоподкаст', 
 	to_regrole('reznik')::INT, 
 	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE);
