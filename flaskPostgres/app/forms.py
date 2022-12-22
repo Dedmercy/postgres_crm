@@ -61,7 +61,6 @@ class AddPerkForm(FlaskForm):
 
 
 class CreationTaskForm(FlaskForm):
-    id = IntegerField('Task id', validators=[DataRequired()])
     executor = IntegerField('Choose freelancer', validators=[DataRequired()])
     deadline = StringField('Deadline', validators=[DataRequired()])
     description = TextAreaField('Task description')

@@ -85,6 +85,7 @@ class TaskModel:
     deadline_date: datetime.datetime
     status: str
     complete_date: datetime.datetime | None
+    client_login: str
 
     @classmethod
     def parse_from_query(cls, request_query: list) -> list:
@@ -97,6 +98,7 @@ class TaskModel:
             deadline_date: datetime.datetime = v[4]
             status: str = v[5]
             complete_date: datetime.datetime | None = v[6]
+            client_login: str = v[7]
 
             task_model = TaskModel(id_,
                                    description,
@@ -104,7 +106,8 @@ class TaskModel:
                                    creation_date,
                                    deadline_date,
                                    status,
-                                   complete_date)
+                                   complete_date,
+                                   client_login)
 
             task_list.append(task_model)
         return task_list

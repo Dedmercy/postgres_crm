@@ -1,6 +1,7 @@
 import logging as log
 
 import psycopg2
+import psycopg2.errors as db_errors
 from flask import render_template, redirect, url_for, flash, request, session, abort
 from psycopg2.extensions import connection as psycopg_connection
 from sqlalchemy.exc import OperationalError
@@ -480,21 +481,22 @@ def create_task():
         if request.form['submit'] == 'Create task':
             query_create_task = f'''
                 CALL create_task(
-                    %s,
                     %s::TEXT,
                     %s,
                     %s::TIMESTAMP WITHOUT TIME ZONE
                 );
             '''
-            params = (creation_form.id.data, creation_form.description.data, creation_form.executor.data,
+            params = (creation_form.description.data, creation_form.executor.data,
                       creation_form.deadline.data)
 
             try:
                 query_executor(user_connections[username], query_create_task, params)
                 print(f'done {query_create_task}')
             except Exception as e:
-
+                print(type(e))
                 print(e)
+                flash('Не получилось создать задание!')
+                return redirect(url_for('create_task'))
             return redirect(url_for('index'))
 
     return parametrized_render_template("create_task.html",

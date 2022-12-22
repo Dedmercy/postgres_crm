@@ -47,13 +47,6 @@
         <section id="create-task-form-section">
             <form action="" method="post" novalidate>
                 <div>
-                    <p>{{ main_form.id.label }}</p>
-                    <div>{{ main_form.id()}}</div>
-                    {% for error in main_form.id.errors %}
-                        <span style="color: red;">[{{ error }}]</span>
-                    {% endfor %}
-                </div>
-                <div>
                     <p>{{ main_form.executor.label }}</p>
                     <div>{{ main_form.executor()}}</div>
                     {% for error in main_form.executor.errors %}
