@@ -1,8 +1,37 @@
 #creation-task-box{
-    border: 1px solid #D8DEE4;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+#creation-task-box section{
     margin: 20px;
-    padding: 20px;
+    width: 50%;
+}
+
+#choose-executor-section, .service-container, #create-task-form-section{
+    padding: 10px;
     background-color: #F6F8FA;
+    border: 1px solid #D8DEE4;
+    border-radius: 5px;
+}
+
+.service-container {
+    margin-top: 10px;
+}
+
+.service-container a{
+    color: dodgerblue;
+    text-decoration: none;
+}
+
+.service-container a:visited{
+    color: dodgerblue;
+}
+
+.service-container a:hover{
+    cursor: pointer;
+    color: dodgerblue;
+    text-decoration: underline;
 }
 
 #submit{

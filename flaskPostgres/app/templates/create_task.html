@@ -15,8 +15,9 @@
             }
         }
     </script>
-    <div id="creation-task-page-main-box">
+    <div id="creation-task-box">
         <section id="choose-executor-section">
+        <h1> Choose freelancer</h1>
             <form action="" method="post" novalidate>
                 <div>
                     <p>{{ second_form.specialization.label }}</p>
@@ -31,20 +32,25 @@
                 </div>
                 <div>{{ second_form.submit(value="Choose executor") }}</div>
             </form>
-        </section>
-        <section id='services-section'>
-            {% for service in services %}
-                <div class="service-container">
-                    <p>Freelancer id: {{ service.id }}</p>
-                    <a href="{{ 'check-review/' + service.login }}">{{ service.first_name + ' ' + service.last_name}}</a>
-                    <p>Price: {{ service.price }}</p>
-                    <p>{{ services.description }}</p>
-                    <p>Last time been online: {{ service.last_seen_datetime.strftime('%Y-%m-%d %H:%M') }}</p>
-                    <p></p>
-                </div>
-            {% endfor %}
+            <div id='services-section'>
+                <h1>Suitable freelancers</h1>
+                {% if services|length == 0 %}
+                    <h2>There are no freelancers doing this kind of work yet</h2>
+                {% endif %}
+                {% for service in services %}
+                    <div class="service-container">
+                        <p>Freelancer id: {{ service.id }}</p>
+                        <a href="{{ 'check-review/' + service.login }}">{{ service.first_name + ' ' + service.last_name}}</a>
+                        <p>Price: {{ service.price }}</p>
+                        <p>{{ services.description }}</p>
+                        <p>Last time been online: {{ service.last_seen_datetime.strftime('%Y-%m-%d %H:%M') }}</p>
+                        <p></p>
+                    </div>
+                {% endfor %}
+            </div>
         </section>
         <section id="create-task-form-section">
+        <h1>Create task</h1>
             <form action="" method="post" novalidate>
                 <div>
                     <p>{{ main_form.executor.label }}</p>
