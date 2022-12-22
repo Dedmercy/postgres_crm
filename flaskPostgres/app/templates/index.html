@@ -26,9 +26,9 @@
                         <p>About task: <br>{{ task.description }}</p>
                         <div>
                             {% if current_user.role == 'freelancer' %}
-                                <p>Author: </p><a href="{{"check-review/" + task.login }}">{{ task.login }}</a>
+                                <p>Author: </p><a href="{{"/check-review/" + task.login }}">{{ task.login }}</a>
                             {% else %}
-                                <p>Executor: </p><a href="{{"check-review/" + task.login }}">{{ task.login }}</a>
+                                <p>Executor: </p><a href="{{"/check-review/" + task.login }}">{{ task.login }}</a>
                             {% endif %}
                             <p>Creation date: {{ task.creation_date.strftime('%Y-%m-%d %H:%M') }}</p>
                             <p>Deadline date: {{ task.deadline_date.strftime('%Y-%m-%d %H:%M') }}</p>

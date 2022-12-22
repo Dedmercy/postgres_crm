@@ -40,7 +40,7 @@
                 {% for service in services %}
                     <div class="service-container">
                         <p>Freelancer id: {{ service.id }}</p>
-                        <a href="{{ 'check-review/' + service.login }}">{{ service.first_name + ' ' + service.last_name}}</a>
+                        <a href="{{ '/check-review/' + service.login }}">{{ service.first_name + ' ' + service.last_name}}</a>
                         <p>Price: {{ service.price }}</p>
                         <p>{{ services.description }}</p>
                         <p>Last time been online: {{ service.last_seen_datetime.strftime('%Y-%m-%d %H:%M') }}</p>
