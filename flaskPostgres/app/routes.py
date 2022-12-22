@@ -179,8 +179,10 @@ def second_auth():
         username = session['username']
         if username in user_connections.keys():
             return redirect(url_for('index'))
-        if username not in user_codes:
-            return redirect(url_for('login'))
+
+    username_temp = session['username_temp']
+    if username_temp not in user_codes:
+        return redirect(url_for('login'))
 
 
     form: SecondAuth = SecondAuth()

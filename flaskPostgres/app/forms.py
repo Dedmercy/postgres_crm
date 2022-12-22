@@ -135,7 +135,7 @@ class IntLength:
             self.field_flags["maxlength"] = self.max
 
     def __call__(self, form, field):
-        length = field.data and int(math.log10(field.data)) or 0
+        length = field.data and len(str(field.data)) or 0
         if length >= self.min and (self.max == -1 or length <= self.max):
             return
 
