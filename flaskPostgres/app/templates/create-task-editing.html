@@ -1,7 +1,7 @@
 {% extends "main-menu-base.html" %}
 {% block content %}
     <div id="create-task-editing-box">
-        <section>
+        <section id="create-task-editing-section">
             <form method="post" action="" novalidate>
                 <div>
                     <p>{{ form.task.label }}</p>
@@ -35,12 +35,6 @@
                     {{ form.submit() }}
                 </div>
             </form>
-            <form>
-
-            </form>
-        </section>
-        <section>
-
         </section>
     </div>
 {% endblock %}

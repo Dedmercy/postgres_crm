@@ -21,9 +21,9 @@
             {% for editing_model in editing_models %}
                 <div class="editing-container">
                     <p>#{{ editing_model['num'] }}</p>
-                    <p>#{{ editing_model['header'] }}</p>
-                    <p>#{{ editing_model['task'] }}</p>
-                    <p>#{{ editing_model['creation_datetime'] }}</p>
+                    <p style="font-weight: 800">{{ editing_model['header'] }}</p>
+                    <p>Text: {{ editing_model['text'] }}</p>
+                    <p>Creation time: {{ editing_model['creation_datetime'] }}</p>
                 </div>
             {% endfor %}
         </section>
