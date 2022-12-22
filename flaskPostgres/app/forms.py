@@ -1,3 +1,4 @@
+import math
 import re
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, EmailField, SelectField, \
@@ -8,6 +9,8 @@ from wtforms.validators import DataRequired, EqualTo, ValidationError, Length
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
+    # auth_form = SelectField('Auth method', choices=('mail', 'sms'))
+    # auth_form = SelectField('Auth method', choices=('mail',))
     submit = SubmitField('Sign in')
 
 
@@ -97,3 +100,74 @@ class CreateEditingForm(FlaskForm):
                                                Length(max=20, message="Header length must be less than 20")])
     text = TextAreaField('Editing description')
     submit = SubmitField("Show info")
+
+
+class IntLength:
+    """
+    Validates the length of a string.
+
+    :param min:
+        The minimum required length of the string. If not provided, minimum
+        length will not be checked.
+    :param max:
+        The maximum length of the string. If not provided, maximum length
+        will not be checked.
+    :param message:
+        Error message to raise in case of a validation error. Can be
+        interpolated using `%(min)d` and `%(max)d` if desired. Useful defaults
+        are provided depending on the existence of min and max.
+
+    When supported, sets the `minlength` and `maxlength` attributes on widgets.
+    """
+
+    def __init__(self, min=-1, max=-1, message=None):
+        assert (
+                min != -1 or max != -1
+        ), "At least one of `min` or `max` must be specified."
+        assert max == -1 or min <= max, "`min` cannot be more than `max`."
+        self.min = min
+        self.max = max
+        self.message = message
+        self.field_flags = {}
+        if self.min != -1:
+            self.field_flags["minlength"] = self.min
+        if self.max != -1:
+            self.field_flags["maxlength"] = self.max
+
+    def __call__(self, form, field):
+        length = field.data and int(math.log10(field.data)) or 0
+        if length >= self.min and (self.max == -1 or length <= self.max):
+            return
+
+        if self.message is not None:
+            message = self.message
+
+        elif self.max == -1:
+            message = field.ngettext(
+                "Field must be at least %(min)d character long.",
+                "Field must be at least %(min)d characters long.",
+                self.min,
+            )
+        elif self.min == -1:
+            message = field.ngettext(
+                "Field cannot be longer than %(max)d character.",
+                "Field cannot be longer than %(max)d characters.",
+                self.max,
+            )
+        elif self.min == self.max:
+            message = field.ngettext(
+                "Field must be exactly %(max)d character long.",
+                "Field must be exactly %(max)d characters long.",
+                self.max,
+            )
+        else:
+            message = field.gettext(
+                "Field must be between %(min)d and %(max)d characters long."
+            )
+
+        raise ValidationError(message % dict(min=self.min, max=self.max, length=length))
+
+
+class SecondAuth(FlaskForm):
+    number = IntegerField('Editing number', validators=[DataRequired(), IntLength(6)])
+    submit = SubmitField("Log in")

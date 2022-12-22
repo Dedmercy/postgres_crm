@@ -1,4 +1,5 @@
 import logging as log
+import random as rnd
 
 import psycopg2
 import psycopg2.errors as db_errors
@@ -9,10 +10,11 @@ from werkzeug import Response
 
 from app import app, Config
 from app.forms import RegistrationForm, LoginForm, AddPerkForm, CreationTaskForm, FindFreelancerByPerkForm, \
-    AddReviewForm, ReportsForm, CreateEditingForm
+    AddReviewForm, ReportsForm, CreateEditingForm, SecondAuth
 from app.models import UserModel, TaskModel, ReviewModel, EditingModel, ServiceModel
 from app.forms import RegistrationForm, LoginForm, AddPerkForm, AddReviewForm
 from app.models import UserModel, TaskModel, SpecializationModel, ReviewModel
+from app.second_auth import send_code_email
 
 from flask import render_template, redirect, url_for, flash, request, session, abort
 from sqlalchemy.exc import OperationalError
@@ -27,6 +29,7 @@ backend_connection: psycopg_connection = psycopg2.connect(
     port=Config.port)
 
 user_connections = {}
+user_codes = {}
 
 logger = log.getLogger()
 
@@ -118,7 +121,6 @@ def login():
 
             user_connections[form.username.data] = user_connection
             username = form.username.data
-            session['username'] = username
 
             #  получает инфу для юзера
             query_account_info = f'''
@@ -157,8 +159,41 @@ def login():
             flash(str(e))
             return redirect(url_for('login'))
 
+        if not True:
+            session['username'] = username
+        else:
+            session['username_temp'] = username
+            code = rnd.randint(100000, 999999)
+            user_codes[username] = code
+            send_code_email(account_model.email, account_model.first_name, code)
+            return redirect(url_for('second_auth'))
+
         return redirect(url_for('index'))
     return render_template('login.html', title='Login', form=form)
+
+
+@app.route('/second-auth', methods=['GET', 'POST'])
+def second_auth():
+    # если юзер авторизирован или не запрашивал код, то перебрасывает на главную страницу
+    if 'username' in session:
+        username = session['username']
+        if username in user_connections.keys():
+            return redirect(url_for('index'))
+        if username not in user_codes:
+            return redirect(url_for('login'))
+
+
+    form: SecondAuth = SecondAuth()
+    if form.validate_on_submit():
+        if form.number.data == user_codes[session['username_temp']]:
+            username = session['username_temp']
+            session.pop('username_temp')
+            session['username'] = username
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid code!!')
+
+    return render_template('second_auth.html', title='Login', form=form)
 
 
 @app.route('/logout', methods=['GET', 'POST'])

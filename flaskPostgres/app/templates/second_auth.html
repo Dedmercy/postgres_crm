@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login_styles.css') }}"/>
+</head>
+
+
+{# подключение системы всплывающих сообщений #}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+        <script>
+            alert("{{ message }}");
+        </script>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<body>
+{#    <script>#}
+{#        function showPassword(){#}
+{#            let doc = document.getElementById("password")#}
+{#            if (doc.type === "password"){#}
+{#                doc.type = "text"#}
+{#            }#}
+{#            else{#}
+{#                doc.type = "password"#}
+{#            }#}
+{#        }#}
+{#    </script>#}
+{#    <script>#}
+{#        function prepare(){#}
+{#            let doc = document.getElementById("password")#}
+{#            if (doc.type === "text"){#}
+{#                doc.type = "password"#}
+{#            }#}
+{#        }#}
+{#    </script>#}
+    <header></header>
+    <main>
+
+        <div id="login-container">
+            <div id="head-container">
+                <img src="{{ url_for('static', filename='img/mem.png') }}"/>
+                <h1 class="bold">Sign in</h1>
+            </div>
+            <div id="form-container">
+                <form action="" method="post" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div>
+                        <p class="bold">{{ form.number.label }}</p>
+                        <div class="input-container">{{ form.number() }}</div>
+                    </div>
+                    <div id="submit-container">
+                        {{ form.submit() }}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+    <footer></footer>
+</body>
+</html>
