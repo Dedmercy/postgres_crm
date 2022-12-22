@@ -92,6 +92,16 @@ CALL create_user(
 	'ParolKrutoi',
 	'client');
 	
+CALL create_user(
+	'Владосик',
+	'Чипинкос',
+	'Зовутьгномик',
+	'ewasince@gmail.com',
+	89151226153,
+	'ewasince',
+	'ParolKrutoi228',
+	'client');
+	
 SET ROLE kebab;
 
 -- Проверка отзывов
