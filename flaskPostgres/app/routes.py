@@ -137,6 +137,7 @@ def login():
                     upd.user_email ,
                     upd.user_phone ,
                     rl.role_name,
+                    acc.second_auth_required,
                     acc.profile_image
                 FROM account as acc
                 JOIN user_personal_data as upd
@@ -159,7 +160,7 @@ def login():
             flash(str(e))
             return redirect(url_for('login'))
 
-        if not True:
+        if not account_model.second_auth:
             session['username'] = username
         else:
             session['username_temp'] = username

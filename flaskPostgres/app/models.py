@@ -18,6 +18,7 @@ class UserModel:
     email: str
     number: int
     role: str
+    second_auth: bool
     profile_image: str
 
     @classmethod
@@ -37,7 +38,8 @@ class UserModel:
             email: str = v[9]
             number: int = v[10]
             role: str = v[11]
-            profile_image: str = v[12]
+            second_auth: bool = v[12]
+            profile_image: str = v[13]
 
             user_model = UserModel(account_id,
                                    username,
@@ -51,6 +53,7 @@ class UserModel:
                                    email,
                                    number,
                                    role,
+                                   second_auth,
                                    profile_image)
 
             user_list.append(user_model)

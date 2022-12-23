@@ -42,7 +42,7 @@
                         <div class="vertical-divider"></div>
                         <ul>
                                 <li><a href="{{ url_for('index') }}">Home</a></li>
-                                <li><a href="{{ 'check-review/' + current_user['username'] }}">Reviews</a></li>
+                                <li><a href="{{ '/check-review/' + current_user['username'] }}">Reviews</a></li>
                             {% if current_user['role'] == 'freelancer' %}
                                 <li><a href="{{ url_for('profile') }}">Profile</a></li>
                                 <li><a href="{{ url_for('check_task_editing') }}">Editing</a></li>
