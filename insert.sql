@@ -79,7 +79,7 @@ CALL create_user(
 	'reznik@mail.ru',
 	89661234455,
 	'reznik',
-	'reznikTop1',
+	'reznikeTop1',
 	'freelancer',
 	FALSE,
 	'1-102-128.png');
@@ -97,62 +97,84 @@ CALL create_user(
 	'1-101-128.png');
 	
 CALL create_user(
-	'Владосик',
-	'Чипинкос',
-	'Зовутьгномик',
+	'Владислав',
+	'Ильич',
+	'Лавренов',
 	'ewasince@gmail.com',
 	89151226153,
 	'ewasince',
-	'ParolKrutoi228',
-	'client',
+	'ParolKrutoi228!',
+	'freelancer',
 	TRUE,
 	'1-102-128.png');
 	
-SET ROLE kebab;
+CALL create_user(
+	'Артём',
+	'Непомневич',
+	'Аничков',
+	'dedmercy@gmail.com',
+	89661180398,
+	'dedmercy',
+	'ParolKrutoi1337!',
+	'client',
+	TRUE,
+	'1-101-128.png');
+	
 
--- Проверка отзывов
+SET ROLE ewasince;
+	
 CALL create_review(
-	to_regrole('reznik')::INT,
-	'Отличная работа'::CHARACTER VARYING(25),
-	'Выполнил работу в срок, отличное исполнение.'::TEXT,
+	to_regrole('dedmercy')::INT,
+	'Хороший заказчик!'::CHARACTER VARYING(25),
+	'Адекватные сроки, хорошая зарплата'::TEXT,
 	10::SMALLINT);
-	
-CALL create_review(
-	to_regrole('reznik')::INT,
-	'Всё супер!'::CHARACTER VARYING(25),
-	'Без пререканий!!.'::TEXT,
-	9::SMALLINT);
-	
-CALL create_review(
-	to_regrole('reznik')::INT,
-	'Бургер кинг говно!'::CHARACTER VARYING(25),
-	'Бургер кинг говно! Бургер кинг говно! Бургер кинг говно!'::TEXT,
-	1::SMALLINT);
-	
-SELECT * FROM watch_reviews(to_regrole('reznik')::INT);
- 
- 
- -- Создание задания
-CALL create_task(
-	'сделать видео на утренник', 
-	to_regrole('reznik')::INT, 
-	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE);
-	
-	CALL create_task(
-	'сделать видеоподкаст', 
-	to_regrole('reznik')::INT, 
-	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE);
-	
-RESET ROLE;
-
-
-SET ROLE reznik;
 
 CALL add_perk(
             101,
             228::MONEY,
             'Долго. Дорого. Офигенно.'::TEXT
             );
-			
+
 RESET ROLE;
+	
+SET ROLE dedmercy;
+
+-- Проверка отзывов
+CALL create_review(
+	to_regrole('ewasince')::INT,
+	'Отличная работа'::CHARACTER VARYING(25),
+	'Выполнил работу в срок, отличное исполнение.'::TEXT,
+	10::SMALLINT);
+	
+CALL create_review(
+	to_regrole('ewasince')::INT,
+	'Всё супер!'::CHARACTER VARYING(25),
+	'Без пререканий!!.'::TEXT,
+	9::SMALLINT);
+	
+CALL create_review(
+	to_regrole('ewasince')::INT,
+	'Пойдёт!'::CHARACTER VARYING(25),
+	'Не так быстро как хотелось бы'::TEXT,
+	6::SMALLINT);
+ 
+ -- Создание задания
+CALL create_task(
+	'сделать видео на утренник', 
+	to_regrole('ewasince')::INT, 
+	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE);
+	
+	CALL create_task(
+	'сделать видеоподкаст', 
+	to_regrole('ewasince')::INT, 
+	'12.08.2023'::TIMESTAMP WITHOUT TIME ZONE);
+	
+RESET ROLE;
+
+
+SELECT * FROM watch_reviews(to_regrole('ewasince')::INT);
+	
+SELECT * FROM watch_reviews(to_regrole('dedmercy')::INT);
+
+
 	

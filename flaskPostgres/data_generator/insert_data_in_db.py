@@ -6,15 +6,9 @@ import json
 import psycopg2
 from psycopg2.extensions import connection as psycopg_connection
 from RandomWordGenerator import RandomWord
+from random_word import RandomWords
 
 from config import Config
-
-# backend_connection: psycopg_connection = psycopg2.connect(
-#     database=Config.database,
-#     user='postgres',
-#     password='VupsenPupsen228',
-#     host=Config.host,
-#     port=Config.port)
 
 # Creating a random word object
 rw = RandomWord(12,
@@ -79,47 +73,109 @@ class Profile:
     second_auth_req: bool
     image_path: str
 
+    @classmethod
+    def parse_from_json(cls, jsons_list: list):
+        profiles = []
+        for p in jsons_list:
+            profile = Profile(**p)
+            profiles.append(profile)
+        return profiles
+
     def __str__(self):
         return ', '.join(self.__dict__.values())
 
 
-from random_word import RandomWords
+def generate_users(count):
+    random_words = RandomWords()
+    words_list = list()
+    for n in range(count):
+        if n % (count // 10) if count // 10 != 0 else 1 == 0:
+            print(f'generate users: {round(n / count * 100)}%')
+        words_list.append(random_words.get_random_word())
 
-count = 500
+    usernames = [n[:12] for n in set(words_list)]
+    names_list = rnd.choices(names, k=count)
+    middle_names_list = rnd.choices(middle_names, k=count)
+    last_names_list = rnd.choices(last_names, k=count)
+    passwords = rw.getList(count)
+    image_paths = rnd.choices(images, k=count)
 
-random_words = RandomWords()
-words_list = list()
-for n in range(500):
-    if n % (count // 100 * 10) == 0:
-        print(f'{n}%')
-    words_list.append(random_words.get_random_word())
+    profiles: list[Profile] = list()
+    for n, nick in enumerate(usernames):
+        profile = Profile(
+            first_name=names_list[n],
+            middle_name=middle_names_list[n],
+            last_name=last_names_list[n],
+            email=f'{nick}@{rnd.choice(emails)}',
+            phone=int(f'89{rnd.randint(100000000, 809999999)}'),
+            user_nickname=nick,
+            user_password=passwords[n],
+            role_name=roles[0] if n % 2 == 0 else roles[1],
+            second_auth_req=False,
+            image_path=image_paths[n]
+        )
+        profiles.append(profile)
 
-usernames = list(set(words_list))
-names_list = rnd.choices(names, k=count)
-middle_names_list = rnd.choices(last_names, k=count)
-last_names_list = rnd.choices(middle_names, k=count)
-passwords = rw.getList(count)
-image_paths = rnd.choices(images, k=count)
+    # result_str = '\n'.join((str(i) for i in profiles))
 
-profiles: list[Profile] = list()
-for n, nick in enumerate(usernames):
-    profile = Profile(
-        first_name=names_list[n],
-        middle_name=middle_names_list[n],
-        last_name=last_names_list[n],
-        email=f'{nick}@{rnd.choice(emails)}',
-        phone=int(f'89{rnd.randint(100000000, 809999999)}'),
-        user_nickname=nick,
-        user_password=passwords[n],
-        role_name=roles[0] if n % 2 == 0 else roles[1],
-        second_auth_req=False,
-        image_path=image_paths[n]
-    )
+    with open('accounts.json', 'w', encoding="utf-8") as f:
+        users = [o.__dict__ for o in profiles]
+        json.dump(users, f)
 
-# result_str = '\n'.join((str(i) for i in profiles))
+    print(f'generate users done, count users= {len(profiles)}')
+    return profiles
 
-with open('accounts.json', 'w', encoding="utf-8") as f:
-    json_dict = {'data': [o.__dict__ for o in profiles]}
-    json.dump(json_dict, f)
 
-print('done')
+def query_executor(connection, query: str, params: tuple):
+    result = None
+
+    with connection.cursor() as cursor:
+        connection.autocommit = True
+        cursor.execute(query, params)
+        if cursor.pgresult_ptr is not None:
+            result = cursor.fetchall()
+
+        return result
+
+
+if __name__ == '__main__':
+    flag_from_disk = True
+
+    connection: psycopg_connection = psycopg2.connect(
+        database=Config.database,
+        user='postgres',
+        password='VupsenPupsen228',
+        host=Config.host,
+        port=Config.port)
+
+    if flag_from_disk:
+        with open('accounts.json', 'r', encoding='utf-8') as f:
+            accounts = json.load(f)
+
+        users = Profile.parse_from_json(accounts)
+    else:
+        count_users = 1000
+
+        users = generate_users(count_users)
+
+    query = f'''
+        CALL create_user(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+    '''
+
+    print('processing')
+    count = len(users)
+    for n, u in enumerate(users):
+        if n % (count // 10) if count // 10 != 0 else 1 == 0:
+            print(f'generate users: {round(n / count * 100)}%')
+        params = (u.first_name,
+                  u.middle_name,
+                  u.last_name,
+                  u.email,
+                  u.phone,
+                  u.user_nickname,
+                  u.user_password,
+                  u.role_name,
+                  u.second_auth_req,
+                  u.image_path)
+        query_executor(connection, query, params)
+    print(f'inserting users done')
