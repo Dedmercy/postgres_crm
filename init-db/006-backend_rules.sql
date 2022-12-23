@@ -1,7 +1,7 @@
 -- Разрешить доступ к таблицам базы данных
 GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public to backend;
 
---УБРАТЬ 
+-- Шифровка паролей
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- Процедура создания нового пользователя.

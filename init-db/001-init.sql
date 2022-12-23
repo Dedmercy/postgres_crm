@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS User_Personal_Data;
 DROP TABLE IF EXISTS Account;
 DROP TABLE IF EXISTS Perk;
 DROP TABLE IF EXISTS Role;
-DROP TABLE IF EXISTS Spezialization;
+DROP TABLE IF EXISTS Specialization;
 
 
 
@@ -116,7 +116,7 @@ CREATE TABLE Service
 
 
 -- Таблица, хранящая данные о направлениях предлагаемых услуг.
-CREATE TABLE Spezialization
+CREATE TABLE Specialization
 (
 	-- Идентификатор специализации
 	sp_id int NOT NULL,
@@ -180,7 +180,7 @@ CREATE TABLE User_Personal_Data
 /* Create Foreign Keys */
 
 ALTER TABLE Review
-	ADD FOREIGN KEY (account_id)
+	ADD FOREIGN KEY (author_id)
 	REFERENCES Account (account_id)
 	ON UPDATE RESTRICT
 	ON DELETE RESTRICT
@@ -188,7 +188,7 @@ ALTER TABLE Review
 
 
 ALTER TABLE Review
-	ADD FOREIGN KEY (author_id)
+	ADD FOREIGN KEY (account_id)
 	REFERENCES Account (account_id)
 	ON UPDATE RESTRICT
 	ON DELETE RESTRICT
@@ -245,7 +245,7 @@ ALTER TABLE Account
 
 ALTER TABLE Perk
 	ADD FOREIGN KEY (sp_id)
-	REFERENCES Spezialization (sp_id)
+	REFERENCES Specialization (sp_id)
 	ON UPDATE RESTRICT
 	ON DELETE RESTRICT
 ;
@@ -305,9 +305,9 @@ COMMENT ON COLUMN Service.account_id IS 'Идентификационный но
 COMMENT ON COLUMN Service.price IS 'Цена за услугу
 ';
 COMMENT ON COLUMN Service.description IS 'Дополнительная информация';
-COMMENT ON TABLE Spezialization IS 'Таблица, хранящая данные о направлениях предлагаемых услуг.';
-COMMENT ON COLUMN Spezialization.sp_id IS 'Идентификатор специализации';
-COMMENT ON COLUMN Spezialization.sp_name IS 'Наименование специализации';
+COMMENT ON TABLE Specialization IS 'Таблица, хранящая данные о направлениях предлагаемых услуг.';
+COMMENT ON COLUMN Specialization.sp_id IS 'Идентификатор специализации';
+COMMENT ON COLUMN Specialization.sp_name IS 'Наименование специализации';
 COMMENT ON TABLE Task IS 'Таблица, хранящая данные о оформленных заданиях.';
 COMMENT ON COLUMN Task.task_id IS 'Идентификатор задания';
 COMMENT ON COLUMN Task.task_description IS 'Описания задания';

@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_DB: "postgres"
       POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "VupsenPupsen228"
+      POSTGRES_PASSWORD: "Vupsen@iPupsen@228"
 #    volumes:
 #      - type: bind
 #        source: ./export

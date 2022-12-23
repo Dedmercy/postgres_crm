@@ -89,7 +89,7 @@ def generate_users(count):
     random_words = RandomWords()
     words_list = list()
     for n in range(count):
-        if n % (count // 10) if count // 10 != 0 else 1 == 0:
+        if n % ((count // 10) if count // 10 != 0 else 1) == 0:
             print(f'generate users: {round(n / count * 100)}%')
         words_list.append(random_words.get_random_word())
 
@@ -143,8 +143,8 @@ if __name__ == '__main__':
 
     connection: psycopg_connection = psycopg2.connect(
         database=Config.database,
-        user='postgres',
-        password='VupsenPupsen228',
+        user='backend',
+        password='Rkahwhx5rbY8#',
         host=Config.host,
         port=Config.port)
 
@@ -165,8 +165,8 @@ if __name__ == '__main__':
     print('processing')
     count = len(users)
     for n, u in enumerate(users):
-        if n % (count // 10) if count // 10 != 0 else 1 == 0:
-            print(f'generate users: {round(n / count * 100)}%')
+        if n % ((count // 10) if count // 10 != 0 else 1) == 0:
+            print(f'inserting users: {round(n / count * 100)}%')
         params = (u.first_name,
                   u.middle_name,
                   u.last_name,

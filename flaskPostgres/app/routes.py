@@ -23,8 +23,8 @@ from psycopg2.extensions import connection as psycopg_connection
 
 backend_connection: psycopg_connection = psycopg2.connect(
     database=Config.database,
-    user='postgres',
-    password='VupsenPupsen228',
+    user='backend',
+    password='Rkahwhx5rbY8#',
     host=Config.host,
     port=Config.port)
 
@@ -157,7 +157,7 @@ def login():
             flash('Invalid username or password')
             return redirect(url_for('login'))
         except Exception as e:
-            flash(str(e))
+            flash('Invalid username or password', str(e))
             return redirect(url_for('login'))
 
         if not account_model.second_auth:
@@ -189,7 +189,6 @@ def second_auth():
     username_temp = session['username_temp']
     if username_temp not in user_codes:
         return redirect(url_for('login'))
-
 
     form: SecondAuth = SecondAuth()
     if form.validate_on_submit():
@@ -259,8 +258,8 @@ def profile():
 
     form: AddPerkForm = AddPerkForm()
 
-    query_find_all_spezializations = f'''
-        SELECT * FROM spezialization;
+    query_find_all_specializations = f'''
+        SELECT * FROM specialization;
     '''
 
     query_find_all_perks = f'''
@@ -282,7 +281,7 @@ def profile():
         WHERE account_id = to_regrole(%s);
     '''
 
-    all_specializations = query_executor(backend_connection, query_find_all_spezializations, ())
+    all_specializations = query_executor(backend_connection, query_find_all_specializations, ())
     all_perks = query_executor(backend_connection, query_find_all_perks, (username,))
     current_user_perks = query_executor(backend_connection, query_current_user_perks, (username,))
 
@@ -477,8 +476,8 @@ def create_task():
     find_freelancer_form = FindFreelancerByPerkForm()
 
     # Запрос для получения всех специализаций
-    query_find_all_spezializations = f'''
-            SELECT * FROM spezialization;
+    query_find_all_specializations = f'''
+            SELECT * FROM specialization;
         '''
 
     # Запрос для получения всех навыков
@@ -487,7 +486,7 @@ def create_task():
         '''
 
     perks = query_executor(backend_connection, query_find_all_perks, ())
-    specializations = query_executor(backend_connection, query_find_all_spezializations, ())
+    specializations = query_executor(backend_connection, query_find_all_specializations, ())
 
     find_freelancer_form.specialization.choices = specializations
 

@@ -12,7 +12,7 @@
 	<category_index>0</category_index>
 	<zoom>1.0</zoom>
 	<x>0</x>
-	<y>21</y>
+	<y>0</y>
 	<default_color>
 		<r>128</r>
 		<g>128</g>
@@ -135,7 +135,7 @@
 			</connections>
 			<display>false</display>
 			<creation_date>2022-12-10 14:51:43</creation_date>
-			<updated_date>2022-12-23 18:50:34</updated_date>
+			<updated_date>2022-12-23 21:40:09</updated_date>
 			<model_property>
 				<name>Project Name</name>
 				<value></value>
@@ -719,12 +719,12 @@
 	<contents>
 		<table>
 			<id>0</id>
-			<height>100</height>
+			<height>107</height>
 			<width>257</width>
 				<font_name>Segoe UI</font_name>
 				<font_size>9</font_size>
-			<x>108</x>
-			<y>96</y>
+			<x>240</x>
+			<y>312</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
@@ -877,8 +877,8 @@
 			<width>244</width>
 				<font_name>Segoe UI</font_name>
 				<font_size>9</font_size>
-			<x>660</x>
-			<y>81</y>
+			<x>696</x>
+			<y>120</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
@@ -991,6 +991,11 @@
 						<source_yp>-1</source_yp>
 						<target_xp>-1</target_xp>
 						<target_yp>-1</target_yp>
+						<bendpoint>
+							<relative>false</relative>
+							<x>839</x>
+							<y>611</y>
+						</bendpoint>
 						<color>
 							<r>0</r>
 							<g>0</g>
@@ -1013,11 +1018,6 @@
 						<source_yp>-1</source_yp>
 						<target_xp>-1</target_xp>
 						<target_yp>-1</target_yp>
-						<bendpoint>
-							<relative>false</relative>
-							<x>839</x>
-							<y>611</y>
-						</bendpoint>
 						<color>
 							<r>0</r>
 							<g>0</g>
@@ -1043,7 +1043,7 @@
 				<normal_column>
 					<id>5</id>
 					<referenced_column>37</referenced_column>
-					<relation>1</relation>
+					<relation>2</relation>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -1209,7 +1209,7 @@
 				<normal_column>
 					<id>10</id>
 					<referenced_column>37</referenced_column>
-					<relation>2</relation>
+					<relation>1</relation>
 					<description>Айди автора отзыва</description>
 					<unique_key_name></unique_key_name>
 					<logical_name>Автор отзыва</logical_name>
@@ -1256,8 +1256,8 @@
 			<width>189</width>
 				<font_name>Segoe UI</font_name>
 				<font_size>9</font_size>
-			<x>384</x>
-			<y>180</y>
+			<x>336</x>
+			<y>480</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
@@ -1266,7 +1266,7 @@
 			<connections>
 				<relation>
 					<id>3</id>
-					<source>9</source>
+					<source>0</source>
 					<target>3</target>
 						<source_xp>-1</source_xp>
 						<source_yp>-1</source_yp>
@@ -1288,7 +1288,7 @@
 				</relation>
 				<relation>
 					<id>4</id>
-					<source>0</source>
+					<source>9</source>
 					<target>3</target>
 						<source_xp>-1</source_xp>
 						<source_yp>-1</source_yp>
@@ -1319,7 +1319,7 @@
 				<normal_column>
 					<id>11</id>
 					<referenced_column>0</referenced_column>
-					<relation>4</relation>
+					<relation>3</relation>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -1353,7 +1353,7 @@
 				<normal_column>
 					<id>12</id>
 					<referenced_column>37</referenced_column>
-					<relation>3</relation>
+					<relation>4</relation>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -1959,11 +1959,11 @@
 		<table>
 			<id>6</id>
 			<height>100</height>
-			<width>159</width>
+			<width>207</width>
 				<font_name>Segoe UI</font_name>
 				<font_size>9</font_size>
-			<x>96</x>
-			<y>348</y>
+			<x>372</x>
+			<y>108</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
@@ -1971,8 +1971,8 @@
 			</color>
 			<connections>
 			</connections>
-			<physical_name>Spezialization</physical_name>
-			<logical_name>Spezialization</logical_name>
+			<physical_name>Specialization</physical_name>
+			<logical_name>Specialization</logical_name>
 			<description>Таблица, хранящая данные о направлениях предлагаемых услуг.</description>
 			<constraint></constraint>
 			<primary_key_name></primary_key_name>
@@ -2214,8 +2214,8 @@
 			<width>276</width>
 				<font_name>Segoe UI</font_name>
 				<font_size>9</font_size>
-			<x>228</x>
-			<y>552</y>
+			<x>312</x>
+			<y>684</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
