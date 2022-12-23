@@ -64,6 +64,15 @@
                         </div>
                         <p>Show password</p>
                     </div>
+
+                    <div>
+                         <p>{{ form.auth_form.label }}</p>
+                        <div>{{ form.auth_form() }}</div>
+                        {% for error in form.auth_form.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+
                     <div id="submit-container">
                         {{ form.submit( onclick='prepare()') }}
                     </div>

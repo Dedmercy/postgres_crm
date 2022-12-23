@@ -9,7 +9,7 @@ from wtforms.validators import DataRequired, EqualTo, ValidationError, Length
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
-    # auth_form = SelectField('Auth method', choices=('mail', 'sms'))
+    auth_form = SelectField('Auth method', choices=('mail', 'phone call'))
     # auth_form = SelectField('Auth method', choices=('mail',))
     submit = SubmitField('Sign in')
 
@@ -169,5 +169,5 @@ class IntLength:
 
 
 class SecondAuth(FlaskForm):
-    number = IntegerField('Editing number', validators=[DataRequired(), IntLength(6)])
+    number = IntegerField('Verification code', validators=[DataRequired(), IntLength(4)])
     submit = SubmitField("Log in")
