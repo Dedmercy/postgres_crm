@@ -2,7 +2,7 @@ import math
 import re
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, EmailField, SelectField, \
-    TelField, TextAreaField, DateTimeLocalField, IntegerField
+    TelField, TextAreaField, DateTimeLocalField, IntegerField, BooleanField
 from wtforms.validators import DataRequired, EqualTo, ValidationError, Length
 
 
@@ -30,6 +30,7 @@ class RegistrationForm(FlaskForm):
                                                      Length(min=8, max=16,
                                                             message='Length should be between 8 and 16')])
     confirm_password = PasswordField('Confirm your password', validators=[DataRequired(), EqualTo('password')])
+    second_auth = BooleanField('Use second auth')
     submit = SubmitField('Registration')
 
     def validate_email(self, field):

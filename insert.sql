@@ -9,7 +9,7 @@ VALUES
 	(to_regrole('freelancer'), 'freelancer');
 	
 -- Вставка данных spezialization
-INSERT INTO spezialization(
+INSERT INTO specialization(
 	sp_id,
 	sp_name)
 VALUES
@@ -110,9 +110,9 @@ CALL create_user(
 	
 CALL create_user(
 	'Артём',
-	'Непомневич',
+	'Михайлович',
 	'Аничков',
-	'dedmercy@gmail.com',
+	'dedmercy@yandex.ru',
 	89661180398,
 	'dedmercy',
 	'ParolKrutoi1337!',

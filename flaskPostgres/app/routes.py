@@ -231,10 +231,11 @@ def registration():
                        form.phone.data,
                        form.username.data,
                        form.password.data,
-                       form.post.data)
+                       form.post.data,
+                       form.second_auth.data)
 
         registration_query = f'''
-            CALL create_user(%s, %s, %s, %s, %s, %s, %s, %s);
+            CALL create_user(%s, %s, %s, %s, %s, %s, %s, %s, %s);
         '''
         try:
             log.debug(f'{log_prefix} try to {registration_query}')
