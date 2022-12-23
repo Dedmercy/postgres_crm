@@ -129,13 +129,16 @@ def generate_users(count):
 def query_executor(connection, query: str, params: tuple):
     result = None
 
-    with connection.cursor() as cursor:
-        connection.autocommit = True
-        cursor.execute(query, params)
-        if cursor.pgresult_ptr is not None:
-            result = cursor.fetchall()
+    try:
+        with connection.cursor() as cursor:
+            connection.autocommit = True
+            cursor.execute(query, params)
+            if cursor.pgresult_ptr is not None:
+                result = cursor.fetchall()
 
-        return result
+            return result
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':
@@ -154,7 +157,7 @@ if __name__ == '__main__':
 
         users = Profile.parse_from_json(accounts)
     else:
-        count_users = 1000
+        count_users = 1500
 
         users = generate_users(count_users)
 
