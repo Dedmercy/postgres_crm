@@ -1,7 +1,7 @@
 import requests
 import json
 
-with open('config.json') as f:
+with open('/home/dedmercy/bd_cursach/postgres_crm/flaskPostgres/config.json') as f:
     secrets = json.load(f)
 
 email_token = secrets['key']
