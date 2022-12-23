@@ -80,7 +80,9 @@ CALL create_user(
 	89661234455,
 	'reznik',
 	'reznikTop1',
-	'freelancer');
+	'freelancer',
+	FALSE,
+	'1-102-128.png');
 	
 CALL create_user(
 	'Антон',
@@ -90,7 +92,9 @@ CALL create_user(
 	89663217788,
 	'kebab',
 	'ParolKrutoi',
-	'client');
+	'client',
+	FALSE,
+	'1-101-128.png');
 	
 CALL create_user(
 	'Владосик',
@@ -100,7 +104,9 @@ CALL create_user(
 	89151226153,
 	'ewasince',
 	'ParolKrutoi228',
-	'client');
+	'client',
+	TRUE,
+	'1-102-128.png');
 	
 SET ROLE kebab;
 

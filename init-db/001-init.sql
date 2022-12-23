@@ -35,6 +35,8 @@ CREATE TABLE Account
 	last_seen_datetime timestamp,
 	-- Картинка профиля
 	profile_image text DEFAULT 'no_image' NOT NULL,
+	-- Нужна ли двухфакторная аунтефикация для пользователя
+	second_auth_required boolean NOT NULL,
 	PRIMARY KEY (account_id)
 ) WITHOUT OIDS;
 
@@ -277,6 +279,7 @@ COMMENT ON COLUMN Account.account_registration_date IS 'Дата регистр�
 ';
 COMMENT ON COLUMN Account.last_seen_datetime IS 'Дата и время последнего входа в систему.';
 COMMENT ON COLUMN Account.profile_image IS 'Картинка профиля';
+COMMENT ON COLUMN Account.second_auth_required IS 'Нужна ли двухфакторная аунтефикация для пользователя';
 COMMENT ON COLUMN Editing.task_id IS 'Идентификатор задания';
 COMMENT ON COLUMN Editing.editing_num IS 'Идентификатор правки';
 COMMENT ON COLUMN Editing.editing_header IS 'Заголовок правки';

@@ -14,6 +14,7 @@ CREATE PROCEDURE create_user(
 	user_nickname CHARACTER VARYING(12),
 	user_password CHARACTER VARYING(20),
 	role_name CHARACTER VARYING(20),
+	second_auth_req BOOLEAN DEFAULT FALSE,
 	image_path TEXT DEFAULT 'no_image.jpg'
 	)
 	AS $$
@@ -30,7 +31,8 @@ CREATE PROCEDURE create_user(
 		role_id,
 		account_registration_date,
 		last_seen_datetime,
-		profile_image)
+		profile_image,
+		second_auth_required)
 	VALUES(
 		to_regrole(user_nickname),
 		user_nickname,
@@ -38,7 +40,8 @@ CREATE PROCEDURE create_user(
 		to_regrole(role_name),
 		CURRENT_DATE,
 		CURRENT_TIMESTAMP,
-		image_path);
+		image_path,
+		second_auth_req);
 	--	Заполняем таблицу с Персональными данными
 	INSERT INTO user_personal_data(
 		user_data_id,
