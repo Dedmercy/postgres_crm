@@ -38,3 +38,11 @@
     flex-direction: row;
     justify-content: space-around;
 }
+
+@media screen and (max-width: 568px){
+    .review-container{
+        max-width: none;
+        min-width: 300px;
+        width: 80%;
+    }
+}

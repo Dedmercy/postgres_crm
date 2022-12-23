@@ -3,8 +3,24 @@
 }
 
 #create-task-editing-box form{
-    padding: 10px;
+    padding: 20px;
     background-color: #F6F8FA;
     border: 1px solid #D8DEE4;
     border-radius: 5px;
+}
+
+#create-task-editing-box select{
+    width: 80%;
+}
+#create-task-editing-box input{
+    width: 80%;
+}
+#create-task-editing-box textarea{
+    width: 80%;
+}
+
+@media screen and (max-width: 568px){
+    #create-task-editing-box select, #create-task-editing-box input, #create-task-editing-box textarea  {
+        width: 100%;
+    }
 }

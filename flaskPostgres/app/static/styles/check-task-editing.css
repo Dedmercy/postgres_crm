@@ -19,3 +19,9 @@
     width: 60%;
     height: 3em;
 }
+
+@media screen and (max-width: 568px){
+    #task-reports-box select{
+        width: 100%;
+    }
+}

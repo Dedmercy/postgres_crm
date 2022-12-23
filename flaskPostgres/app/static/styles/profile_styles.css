@@ -27,8 +27,8 @@
     margin: 0 10px;
 }
 
-#add-perk-form-section  select, input, textarea{
-    width: 100%;
+#perk-page-main-box select, #perk-page-main-box  input, #perk-page-main-box  textarea{
+    width: 80%;
 }
 
 #add-perk-form-section #add-perk-form-submit-box{
@@ -50,4 +50,22 @@
 
 #perk-page-main-box h1{
     text-align: center;
+}
+
+@media screen and (max-width: 568px){
+    #perk-page-main-box{
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    #perk-page-main-box section{
+        width: 80%;
+    }
+    #perk-page-main-box form div input, #perk-page-main-box form div  select, #perk-page-main-box form div  textarea{
+        margin: 0 auto;
+    }
+    #perk-page-main-box section select, #perk-page-main-box input, #perk-page-main-box textarea{
+        width: 100%
+    }
+
 }

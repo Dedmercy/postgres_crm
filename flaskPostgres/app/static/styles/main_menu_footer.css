@@ -21,3 +21,9 @@ footer a{
     text-decoration: none;
     color: #F6F8FA;
 }
+
+@media screen and (max-width: 568px){
+    footer p{
+        font-size: 12px;
+    }
+}

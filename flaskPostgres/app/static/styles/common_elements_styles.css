@@ -1,0 +1,18 @@
+.link{
+    color: dodgerblue;
+    text-decoration: none;
+}
+
+.link:visited{
+    color: dodgerblue;
+}
+
+.link:hover{
+    cursor: pointer;
+    color: dodgerblue;
+    text-decoration: underline;
+}
+
+.bold{
+    font-weight: 450;
+}

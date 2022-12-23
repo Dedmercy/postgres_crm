@@ -64,3 +64,23 @@ header{
 #box-nav-container{
     width: 80%;
 }
+
+
+@media screen and (max-width: 568px){
+    #header-container{
+        padding: 0 10px;
+    }
+    header a{
+        font-size: 12px;
+    }
+    #nav-container ul li{
+        padding: 8px;
+    }
+    #current-user{
+        width: 0;
+        padding: 0;
+    }
+    #header-container{
+        justify-content: space-between;
+    }
+}

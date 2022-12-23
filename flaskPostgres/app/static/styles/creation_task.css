@@ -19,21 +19,6 @@
     margin-top: 10px;
 }
 
-.service-container a{
-    color: dodgerblue;
-    text-decoration: none;
-}
-
-.service-container a:visited{
-    color: dodgerblue;
-}
-
-.service-container a:hover{
-    cursor: pointer;
-    color: dodgerblue;
-    text-decoration: underline;
-}
-
 #submit{
     height: 2em;
     width: 30%;
@@ -59,4 +44,26 @@ textarea{
 
 #creation-task-box h1{
     text-align: center;
+}
+
+@media screen and (max-width: 568px){
+    #creation-task-box{
+        display: flex;
+        flex-direction: column;
+    }
+    #creation-task-box section{
+        width: 80%;
+        margin: 10px auto;
+    }
+
+    #choose-executor-section h2{
+        font-size: 18px;
+    }
+    #creation-task-box div select, #creation-task-box div input, #creation-task-box div textarea{
+        width: 100%;
+        margin: 0 auto;
+    }
+    #creation-task-box input[type=submit]{
+        margin-top: 10px;
+    }
 }

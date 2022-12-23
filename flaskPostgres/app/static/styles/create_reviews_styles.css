@@ -6,5 +6,11 @@
     padding: 20px;
     border: 1px solid #D8DEE4;
     background-color: #F6F8FA;
+    border-radius: 5px;
+}
 
+@media screen and (max-width: 568px){
+    #creating-review-section select, #creating-review-section input, #creating-review-section  textarea{
+        width: 100%;
+    }
 }
