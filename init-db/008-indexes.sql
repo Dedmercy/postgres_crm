@@ -1,5 +1,6 @@
 -- indexes
 CREATE INDEX account_account_id_indx ON account(account_id);
+CREATE INDEX account_account_id_role_id_indx ON account(account_id, role_id);
 CREATE INDEX account_login_indx ON account(login);
 CREATE INDEX editing_indx ON editing(task_id, editing_num);
 CREATE INDEX perk_indx ON perk(perk_id);

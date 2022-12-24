@@ -142,7 +142,7 @@ def query_executor(connection, query: str, params: tuple):
 
 
 if __name__ == '__main__':
-    flag_from_disk = True
+    flag_from_disk = False
 
     connection: psycopg_connection = psycopg2.connect(
         database=Config.database,
@@ -157,7 +157,7 @@ if __name__ == '__main__':
 
         users = Profile.parse_from_json(accounts)
     else:
-        count_users = 1500
+        count_users = 50000
 
         users = generate_users(count_users)
 
@@ -168,7 +168,7 @@ if __name__ == '__main__':
     print('processing')
     count = len(users)
     for n, u in enumerate(users):
-        if n % ((count // 10) if count // 10 != 0 else 1) == 0:
+        if n % ((count // 100) if count // 100 != 0 else 1) == 0:
             print(f'inserting users: {round(n / count * 100)}%')
         params = (u.first_name,
                   u.middle_name,
